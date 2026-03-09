@@ -5,19 +5,17 @@ from Vehicle import Vehicle
 import serial
 
 # Replace with your serial port
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+PORT = '/dev/ttyACM0'  # or 'COM3' on Windows
+BAUDRATE = 115200
 
-time.sleep(2)  # Wait for module to initialize
+ser = serial.Serial(PORT, BAUDRATE, timeout=1)
 
-# Send a command (depends on firmware)
-ser.write(b'info\r\n')
-
-# Read response
-while True:
-    line = ser.readline().decode('utf-8').strip()
-    if line:
-        print(line)
-
+# Try reading initial data
+line = ser.readline().decode('utf-8', errors='ignore').strip()
+if line:
+    print("Firmware responded:", line)
+else:
+    print("No response — firmware may not be installed")
 this_vehicle = Vehicle()
 
 
