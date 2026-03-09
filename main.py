@@ -13,7 +13,7 @@ import smbus
 bus = smbus.SMBus(2)
 
 # Define device address and register
-DEVICE_ADDRESS = 0x18
+DEVICE_ADDRESS = 0x19
 WHO_AM_I = 0x0F
 
 
