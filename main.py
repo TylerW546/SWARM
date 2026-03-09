@@ -42,57 +42,46 @@ def read_word(register_l):
 
 def read_accel():
     # LIS2DE12 outputs LSB first (little-endian)
-    x = bus.read_byte_data(DEVICE_ADDRESS, 0x28) | (bus.read_byte_data(DEVICE_ADDRESS, 0x29) << 8)
-    y = bus.read_byte_data(DEVICE_ADDRESS, 0x2A) | (bus.read_byte_data(DEVICE_ADDRESS, 0x2B) << 8)
-    z = bus.read_byte_data(DEVICE_ADDRESS, 0x2C) | (bus.read_byte_data(DEVICE_ADDRESS, 0x2D) << 8)
-
-    # Convert to signed 16-bit
-    x = x - 65536 if x > 32767 else x
-    y = y - 65536 if y > 32767 else y
-    z = z - 65536 if z > 32767 else z
+    x = read_word(OUT_X_L)
+    y = read_word(OUT_Y_L)
+    z = read_word(OUT_Z_L)
+    return x * 0.001, y * 0.001, z * 0.001
 
     # High-resolution mode: 1 LSB = 1 mg at ±2g
     return x * 0.001, y * 0.001, z * 0.001  # in g
 
+from collections import deque
+
+SMOOTHING_WINDOW = 5  # Number of samples to average
+
+# Deques to store last N readings for smoothing
+x_window = deque(maxlen=SMOOTHING_WINDOW)
+y_window = deque(maxlen=SMOOTHING_WINDOW)
+z_window = deque(maxlen=SMOOTHING_WINDOW)
+
+def smooth_accel(x, y, z):
+    """Add the latest reading and compute the moving average"""
+    x_window.append(x)
+    y_window.append(y)
+    z_window.append(z)
+    
+    x_avg = sum(x_window) / len(x_window)
+    y_avg = sum(y_window) / len(y_window)
+    z_avg = sum(z_window) / len(z_window)
+    
+    return x_avg, y_avg, z_avg
+
 try:
-    i=0
-    while(True):
+    i = 0
+    while True:
         i += 1
         x, y, z = read_accel()
-        print(f"Sample {i+1} - X: {x}, Y: {y}, Z: {z}")
+        x_s, y_s, z_s = smooth_accel(x, y, z)
+        print(f"Sample {i} - X: {x_s:.3f}, Y: {y_s:.3f}, Z: {z_s:.3f}")
         time.sleep(0.5)
 except Exception as e:
     print("[Test 4] I2C error during continuous read:", e)
-# from mpu6050 import MPU6050
 
-# i2c_bus = 1
-# device_address = 0x29
-# freq_divider = 0x04
-
-# # Make an MPU6050
-# mpu = MPU6050(i2c_bus, device_address, freq_divider)
-
-# # Initiate your DMP
-# mpu.dmp_initialize()
-# mpu.set_DMP_enabled(True)
-
-# packet_size = mpu.DMP_get_FIFO_packet_size()
-# FIFO_buffer = [0]*64
-
-# while True: # infinite loop
-#     if mpu.isreadyFIFO(packet_size): # Check if FIFO data are ready to use...
-        
-#         FIFO_buffer = mpu.get_FIFO_bytes(packet_size) # get all the DMP data here
-        
-#         q = mpu.DMP_get_quaternion_int16(FIFO_buffer)
-#         grav = mpu.DMP_get_gravity(q)
-#         roll_pitch_yaw = mpu.DMP_get_euler_roll_pitch_yaw(q)
-        
-#         print('roll: ' + str(roll_pitch_yaw.x))
-#         print('pitch: ' + str(roll_pitch_yaw.y))
-#         print('yaw: ' + str(roll_pitch_yaw.z))
-#         print('\n')
-        
 # Initialization:
 # Create a vehicle object
 
