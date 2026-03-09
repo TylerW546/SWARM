@@ -13,7 +13,7 @@ import smbus
 bus = smbus.SMBus(1)
 
 # Define device address and register
-DEVICE_ADDRESS = 0x19 # Replace with your device's address
+DEVICE_ADDRESS = 0x18 # Replace with your device's address
 WHO_AM_I = 0x0F # Replace with your register address
 
 # Write a byte to the device
