@@ -1,4 +1,6 @@
 import time
+import smbus
+
 from Vehicle import Vehicle
 
 this_vehicle = Vehicle()
@@ -7,27 +9,74 @@ this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
 this_vehicle.start_communication_module()
 this_vehicle.start_device_discovery()
-import smbus
+BUS_NUMBER = 2
+DEVICE_ADDRESS = 0x37
+WHO_AM_I = 0x0F
+CTRL_REG1 = 0x20  # Example: enable XYZ axes, 100Hz
+OUT_X_L = 0x28    # Base register for accelerometer X-axis LSB
+OUT_Y_L = 0x2A    # Base register for Y-axis LSB
+OUT_Z_L = 0x2C    # Base register for Z-axis LSB
 
-# Initialize SMBus object for I2C bus 1
-bus = smbus.SMBus(2)
+# -------------------------------
+# Initialize bus
+# -------------------------------
+bus = smbus.SMBus(BUS_NUMBER)
 
-# Define device address and register
-DEVICE_ADDRESS = 0x37  # Your IMU
-WHO_AM_I = 0x0F        # Typical WHO_AM_I register
-CTRL_REG1 = 0x20       # Example control register
+# -------------------------------
+# Helper functions
+# -------------------------------
+def read_word(register_l):
+    """Read 16-bit signed value from two registers (little endian)"""
+    lsb = bus.read_byte_data(DEVICE_ADDRESS, register_l)
+    msb = bus.read_byte_data(DEVICE_ADDRESS, register_l + 1)
+    value = (msb << 8) | lsb
+    if value >= 32768:
+        value -= 65536
+    return value
 
+# -------------------------------
+# Test 1: WHO_AM_I
+# -------------------------------
 try:
-    # Initialize device: enable XYZ axes at 100 Hz (example for LIS3DH)
+    whoami = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
+    print(f"[Test 1] WHO_AM_I: 0x{whoami:X}")
+except Exception as e:
+    print("[Test 1] I2C error:", e)
+
+# -------------------------------
+# Test 2: Basic initialization
+# -------------------------------
+try:
     bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG1, 0x57)
     time.sleep(0.1)
-
-    # Read WHO_AM_I to confirm communication
-    data = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
-    print(f"WHO_AM_I read: 0x{data:X}")  # Expect 0xCF
-
+    print("[Test 2] Device initialized (CTRL_REG1 set)")
 except Exception as e:
-    print("I2C error:", e)
+    print("[Test 2] I2C error during initialization:", e)
+
+# -------------------------------
+# Test 3: Read accelerometer once
+# -------------------------------
+try:
+    x = read_word(OUT_X_L)
+    y = read_word(OUT_Y_L)
+    z = read_word(OUT_Z_L)
+    print(f"[Test 3] Accel raw readings - X: {x}, Y: {y}, Z: {z}")
+except Exception as e:
+    print("[Test 3] I2C error during accelerometer read:", e)
+
+# -------------------------------
+# Test 4: Continuous accelerometer read
+# -------------------------------
+print("[Test 4] Continuous accelerometer read (5 samples):")
+try:
+    for i in range(5):
+        x = read_word(OUT_X_L)
+        y = read_word(OUT_Y_L)
+        z = read_word(OUT_Z_L)
+        print(f"Sample {i+1} - X: {x}, Y: {y}, Z: {z}")
+        time.sleep(0.5)
+except Exception as e:
+    print("[Test 4] I2C error during continuous read:", e)
 # from mpu6050 import MPU6050
 
 # i2c_bus = 1
