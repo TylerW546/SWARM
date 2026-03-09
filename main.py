@@ -17,7 +17,7 @@ DEVICE_ADDRESS = 0x19 # Replace with your device's address
 REGISTER = 0x00 # Replace with your register address
 
 # Write a byte to the device
-bus.write_byte_data(DEVICE_ADDRESS, REGISTER, 0x07)
+bus.write_byte_data(DEVICE_ADDRESS, REGISTER, 0x0F)
 
 # Read a byte from the device
 data = bus.read_byte_data(DEVICE_ADDRESS, REGISTER)
