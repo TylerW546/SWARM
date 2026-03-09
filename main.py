@@ -5,7 +5,7 @@ from Vehicle import Vehicle
 import serial
 
 # Replace with your serial port
-ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
 
 time.sleep(2)  # Wait for module to initialize
 
