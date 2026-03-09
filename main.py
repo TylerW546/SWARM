@@ -10,7 +10,7 @@ this_vehicle.start_device_discovery()
 import smbus
 
 # Initialize SMBus object for I2C bus 1
-bus = smbus.SMBus(1)
+bus = smbus.SMBus(2)
 
 # Define device address and register
 DEVICE_ADDRESS = 0x18
