@@ -23,6 +23,10 @@ OUT_Z_L = 0x2C    # Base register for Z-axis LSB
 # -------------------------------
 bus = smbus.SMBus(BUS_NUMBER)
 
+WHO_AM_I = 0x0F
+device_id = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
+print(f"LIS2DE12 WHO_AM_I: {device_id:#04x}")
+
 bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG1, 0x57)  # 0b01010111
 
 # CTRL_REG4 (0x23): Full scale ±2g, high-resolution mode
