@@ -1,7 +1,7 @@
 import smbus
 import time
 
-BUS_NUMBER = 2
+BUS_NUMBER = 1
 
 def scan_i2c_bus():
     bus = smbus.SMBus(BUS_NUMBER)
