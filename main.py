@@ -13,12 +13,12 @@ import smbus
 bus = smbus.SMBus(2)
 
 # Define device address and register
-DEVICE_ADDRESS = 0x19
-WHO_AM_I = 0x0F
-
-
-data = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
-print(f"Data read: {data}")
+for addr in [0x30, 0x37, 0x3a, 0x50, 0x51, 0x54, 0x59]:
+    try:
+        data = bus.read_byte_data(addr, 0x0F)
+        print(f"Address {hex(addr)}: WHO_AM_I = {hex(data)}")
+    except:
+        print(f"Address {hex(addr)}: No response")
 # from mpu6050 import MPU6050
 
 # i2c_bus = 1
