@@ -13,12 +13,21 @@ import smbus
 bus = smbus.SMBus(2)
 
 # Define device address and register
-for addr in [0x30, 0x37, 0x3a, 0x50, 0x51, 0x54, 0x59]:
-    try:
-        data = bus.read_byte_data(addr, 0x0F)
-        print(f"Address {hex(addr)}: WHO_AM_I = {hex(data)}")
-    except:
-        print(f"Address {hex(addr)}: No response")
+DEVICE_ADDRESS = 0x37  # Your IMU
+WHO_AM_I = 0x0F        # Typical WHO_AM_I register
+CTRL_REG1 = 0x20       # Example control register
+
+try:
+    # Initialize device: enable XYZ axes at 100 Hz (example for LIS3DH)
+    bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG1, 0x57)
+    time.sleep(0.1)
+
+    # Read WHO_AM_I to confirm communication
+    data = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
+    print(f"WHO_AM_I read: 0x{data:X}")  # Expect 0xCF
+
+except Exception as e:
+    print("I2C error:", e)
 # from mpu6050 import MPU6050
 
 # i2c_bus = 1
