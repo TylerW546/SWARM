@@ -2,9 +2,21 @@ import time
 from IMU import *
 from I2CScan import *
 from Vehicle import Vehicle
+import serial
 
-scan_i2c_bus()
-run_imu()
+# Replace with your serial port
+ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=1)
+
+time.sleep(2)  # Wait for module to initialize
+
+# Send a command (depends on firmware)
+ser.write(b'info\r\n')
+
+# Read response
+while True:
+    line = ser.readline().decode('utf-8').strip()
+    if line:
+        print(line)
 
 this_vehicle = Vehicle()
 
