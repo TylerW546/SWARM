@@ -4,7 +4,7 @@ from Motors import *
 
 class Vehicle:
     def __init__(self):
-        self.index
+        self.index = 0
 
     def start_imu_process(self):
         pass
