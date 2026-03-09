@@ -14,12 +14,17 @@ bus = smbus.SMBus(1)
 
 # Define device address and register
 DEVICE_ADDRESS = 0x19 # Replace with your device's address
-REGISTER = 0x0F # Replace with your register address
+WHO_AM_I = 0x0F # Replace with your register address
 
 # Write a byte to the device
 
 # Read a byte from the device
-data = bus.read_byte_data(DEVICE_ADDRESS, REGISTER)
+CTRL_REG1 = 0x20
+
+# 100 Hz, enable X Y Z axes
+bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG1, 0x57)
+
+data = bus.read_byte_data(DEVICE_ADDRESS, WHO_AM_I)
 print(f"Data read: {data}")
 # from mpu6050 import MPU6050
 
