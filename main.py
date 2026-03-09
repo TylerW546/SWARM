@@ -47,8 +47,6 @@ def read_accel():
     z = read_word(OUT_Z_L)
     return x * 0.001, y * 0.001, z * 0.001
 
-    # High-resolution mode: 1 LSB = 1 mg at ±2g
-    return x * 0.001, y * 0.001, z * 0.001  # in g
 
 from collections import deque
 
@@ -71,14 +69,33 @@ def smooth_accel(x, y, z):
     
     return x_avg, y_avg, z_avg
 
+ALPHA = 0.2  # smaller = smoother, larger = more responsive
+
+# Initialize smoothed values
+x_smooth = y_smooth = z_smooth = 0.0
+first_reading = True
+
+def smooth_accel_ema(x, y, z):
+    global x_smooth, y_smooth, z_smooth, first_reading
+    if first_reading:
+        x_smooth, y_smooth, z_smooth = x, y, z
+        first_reading = False
+    else:
+        x_smooth = ALPHA * x + (1 - ALPHA) * x_smooth
+        y_smooth = ALPHA * y + (1 - ALPHA) * y_smooth
+        z_smooth = ALPHA * z + (1 - ALPHA) * z_smooth
+    return x_smooth, y_smooth, z_smooth
+
 try:
     i = 0
     while True:
         i += 1
         x, y, z = read_accel()
-        x_s, y_s, z_s = smooth_accel(x, y, z)
-        print(f"Sample {i} - X: {x_s:.3f}, Y: {y_s:.3f}, Z: {z_s:.3f}")
-        time.sleep(0.5)
+        x_ema, y_ema, z_ema = smooth_accel_ema(x, y, z)
+        x_f, y_f, z_f = smooth_accel(x_ema, y_ema, z_ema)
+        if i % 10 == 0:  # Print every 10 samples
+            print(f"Sample {i} - X: {x_f:.3f}, Y: {y_f:.3f}, Z: {z_f:.3f}")
+        time.sleep(0.05)
 except Exception as e:
     print("[Test 4] I2C error during continuous read:", e)
 
