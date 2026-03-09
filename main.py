@@ -13,6 +13,7 @@ BUS_NUMBER = 2
 DEVICE_ADDRESS = 0x37
 WHO_AM_I = 0x0F
 CTRL_REG1 = 0x20  # Example: enable XYZ axes, 100Hz
+CTRL_REG4 = 0x23  # Example: full scale ±2g, high-resolution mode
 OUT_X_L = 0x28    # Base register for accelerometer X-axis LSB
 OUT_Y_L = 0x2A    # Base register for Y-axis LSB
 OUT_Z_L = 0x2C    # Base register for Z-axis LSB
@@ -21,6 +22,11 @@ OUT_Z_L = 0x2C    # Base register for Z-axis LSB
 # Initialize bus
 # -------------------------------
 bus = smbus.SMBus(BUS_NUMBER)
+
+bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG1, 0x57)  # 0b01010111
+
+# CTRL_REG4 (0x23): Full scale ±2g, high-resolution mode
+bus.write_byte_data(DEVICE_ADDRESS, CTRL_REG4, 0x08)  # 0b00001000
 
 # -------------------------------
 # Helper functions
@@ -34,14 +40,25 @@ def read_word(register_l):
         value -= 65536
     return value
 
+def read_accel():
+    # LIS2DE12 outputs LSB first (little-endian)
+    x = bus.read_byte_data(DEVICE_ADDRESS, 0x28) | (bus.read_byte_data(DEVICE_ADDRESS, 0x29) << 8)
+    y = bus.read_byte_data(DEVICE_ADDRESS, 0x2A) | (bus.read_byte_data(DEVICE_ADDRESS, 0x2B) << 8)
+    z = bus.read_byte_data(DEVICE_ADDRESS, 0x2C) | (bus.read_byte_data(DEVICE_ADDRESS, 0x2D) << 8)
+
+    # Convert to signed 16-bit
+    x = x - 65536 if x > 32767 else x
+    y = y - 65536 if y > 32767 else y
+    z = z - 65536 if z > 32767 else z
+
+    # High-resolution mode: 1 LSB = 1 mg at ±2g
+    return x * 0.001, y * 0.001, z * 0.001  # in g
 
 try:
     i=0
     while(True):
         i += 1
-        x = read_word(OUT_X_L)
-        y = read_word(OUT_Y_L)
-        z = read_word(OUT_Z_L)
+        x, y, z = read_accel()
         print(f"Sample {i+1} - X: {x}, Y: {y}, Z: {z}")
         time.sleep(0.5)
 except Exception as e:
