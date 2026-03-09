@@ -1,5 +1,7 @@
 import smbus
 import time
+from collections import deque
+
 
 BUS_NUMBER = 2
 DEVICE_ADDRESS = 0x30
@@ -9,6 +11,11 @@ CTRL_REG4 = 0x23  # Example: full scale ±2g, high-resolution mode
 OUT_X_L = 0x28    # Base register for accelerometer X-axis LSB
 OUT_Y_L = 0x2A    # Base register for Y-axis LSB
 OUT_Z_L = 0x2C    # Base register for Z-axis LSB
+
+# Initialize smoothed values
+x_smooth = y_smooth = z_smooth = 0.0
+first_reading = True
+    
 def run_imu():
     # -------------------------------
     # Initialize bus
@@ -43,9 +50,6 @@ def run_imu():
         z = read_word(OUT_Z_L)
         return x * 0.001, y * 0.001, z * 0.001
 
-
-    from collections import deque
-
     SMOOTHING_WINDOW = 5  # Number of samples to average
 
     # Deques to store last N readings for smoothing
@@ -67,9 +71,7 @@ def run_imu():
 
     ALPHA = 0.2  # smaller = smoother, larger = more responsive
 
-    # Initialize smoothed values
-    x_smooth = y_smooth = z_smooth = 0.0
-    first_reading = True
+    
 
     def smooth_accel_ema(x, y, z):
         global x_smooth, y_smooth, z_smooth, first_reading
