@@ -11,7 +11,7 @@ this_vehicle.start_device_discovery()
 from mpu6050 import MPU6050
 
 i2c_bus = 1
-device_address = 0x18
+device_address = 0x29
 freq_divider = 0x04
 
 # Make an MPU6050
