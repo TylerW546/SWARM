@@ -10,7 +10,7 @@ this_vehicle.start_imu_process()
 this_vehicle.start_communication_module()
 this_vehicle.start_device_discovery()
 BUS_NUMBER = 2
-DEVICE_ADDRESS = 0x37
+DEVICE_ADDRESS = 0x30
 WHO_AM_I = 0x0F
 CTRL_REG1 = 0x20  # Example: enable XYZ axes, 100Hz
 CTRL_REG4 = 0x23  # Example: full scale ±2g, high-resolution mode
@@ -20,7 +20,7 @@ OUT_Z_L = 0x2C    # Base register for Z-axis LSB
 
 # -------------------------------
 # Initialize bus
-# -------------------------------
+# ------------------------------
 bus = smbus.SMBus(BUS_NUMBER)
 
 WHO_AM_I = 0x0F
