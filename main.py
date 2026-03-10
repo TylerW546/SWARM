@@ -23,6 +23,7 @@ while True:
         print("No response yet, retrying...")
     time.sleep(1)
 
+this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
 this_vehicle.start_communication_module()
 this_vehicle.start_device_discovery()
