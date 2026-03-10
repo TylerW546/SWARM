@@ -5,7 +5,7 @@ from Vehicle import Vehicle
 import serial
 
 # Replace with your serial port
-PORT = '/dev/ttyACM0'  # or 'COM3' on Windows
+PORT = '/dev/ttyS0'  # or 'COM3' on Windows
 BAUDRATE = 115200
 
 ser = serial.Serial(PORT, BAUDRATE, timeout=1)
