@@ -10,14 +10,18 @@ BAUDRATE = 115200
 
 ser = serial.Serial(PORT, BAUDRATE, timeout=1)
 
-# Try reading initial data
-line = ser.readline().decode('utf-8', errors='ignore').strip()
-if line:
-    print("Firmware responded:", line)
-else:
-    print("No response — firmware may not be installed")
-this_vehicle = Vehicle()
-
+# Try reading initial data in a loop to check if firmware is responding
+print("Checking for firmware response...")
+while True:
+    if ser.in_waiting > 0:
+        line = ser.readline().decode('utf-8').strip()
+        print(f"Received: {line}")
+        if "Firmware Version" in line:
+            print("Firmware is responding!")
+            break
+    else:
+        print("No response yet, retrying...")
+    time.sleep(1)
 
 this_vehicle.start_imu_process()
 this_vehicle.start_communication_module()
