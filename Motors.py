@@ -1,22 +1,23 @@
 # Write and read from motors and encoders
-# chatgpt
+# thanks chatgpt
 
-import RPi.GPIO as GPIO
-import time
+import lgpio
 
 
 class L298NMotorDriver:
     """
-    Simple L298N motor driver class for Raspberry Pi.
-    Controls two DC motors using IN1–IN4 and optional ENA/ENB (PWM).
+    Simple L298N motor driver class for Raspberry Pi using lgpio.
+    Controls two DC motors using IN1-IN4 and ENA/ENB (PWM).
     """
 
     def __init__(
         self,
+        chip,
         in1, in2, in3, in4,
-        ena=None, enb=None,
+        ena, enb,
         pwm_freq=1000
     ):
+        self.h = chip
         self.in1 = in1
         self.in2 = in2
         self.in3 = in3
@@ -25,57 +26,47 @@ class L298NMotorDriver:
         self.enb = enb
         self.pwm_freq = pwm_freq
 
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setwarnings(False)
-
         for pin in [in1, in2, in3, in4]:
-            GPIO.setup(pin, GPIO.OUT)
-            GPIO.output(pin, GPIO.LOW)
+            lgpio.gpio_claim_output(self.h, pin)
+            lgpio.gpio_write(self.h, pin, 0)
 
-        self.pwm_a = None
-        self.pwm_b = None
+        lgpio.gpio_claim_output(self.h, ena)
+        lgpio.gpio_claim_output(self.h, enb)
 
-        if ena is not None:
-            GPIO.setup(ena, GPIO.OUT)
-            self.pwm_a = GPIO.PWM(ena, pwm_freq)
-            self.pwm_a.start(0)
-
-        if enb is not None:
-            GPIO.setup(enb, GPIO.OUT)
-            self.pwm_b = GPIO.PWM(enb, pwm_freq)
-            self.pwm_b.start(0)
+        self._set_speed(self.ena, 0)
+        self._set_speed(self.enb, 0)
 
     # ---- Motor A ----
     def motor_a_forward(self, speed=100):
-        GPIO.output(self.in1, GPIO.HIGH)
-        GPIO.output(self.in2, GPIO.LOW)
-        self._set_speed(self.pwm_a, speed)
+        lgpio.gpio_write(self.h, self.in1, 1)
+        lgpio.gpio_write(self.h, self.in2, 0)
+        self._set_speed(self.ena, speed)
 
     def motor_a_backward(self, speed=100):
-        GPIO.output(self.in1, GPIO.LOW)
-        GPIO.output(self.in2, GPIO.HIGH)
-        self._set_speed(self.pwm_a, speed)
+        lgpio.gpio_write(self.h, self.in1, 0)
+        lgpio.gpio_write(self.h, self.in2, 1)
+        self._set_speed(self.ena, speed)
 
     def motor_a_stop(self):
-        GPIO.output(self.in1, GPIO.LOW)
-        GPIO.output(self.in2, GPIO.LOW)
-        self._set_speed(self.pwm_a, 0)
+        lgpio.gpio_write(self.h, self.in1, 0)
+        lgpio.gpio_write(self.h, self.in2, 0)
+        self._set_speed(self.ena, 0)
 
     # ---- Motor B ----
     def motor_b_forward(self, speed=100):
-        GPIO.output(self.in3, GPIO.HIGH)
-        GPIO.output(self.in4, GPIO.LOW)
-        self._set_speed(self.pwm_b, speed)
+        lgpio.gpio_write(self.h, self.in3, 1)
+        lgpio.gpio_write(self.h, self.in4, 0)
+        self._set_speed(self.enb, speed)
 
     def motor_b_backward(self, speed=100):
-        GPIO.output(self.in3, GPIO.LOW)
-        GPIO.output(self.in4, GPIO.HIGH)
-        self._set_speed(self.pwm_b, speed)
+        lgpio.gpio_write(self.h, self.in3, 0)
+        lgpio.gpio_write(self.h, self.in4, 1)
+        self._set_speed(self.enb, speed)
 
     def motor_b_stop(self):
-        GPIO.output(self.in3, GPIO.LOW)
-        GPIO.output(self.in4, GPIO.LOW)
-        self._set_speed(self.pwm_b, 0)
+        lgpio.gpio_write(self.h, self.in3, 0)
+        lgpio.gpio_write(self.h, self.in4, 0)
+        self._set_speed(self.enb, 0)
 
     # ---- Helpers ----
     def stop_all(self):
@@ -84,15 +75,8 @@ class L298NMotorDriver:
 
     def cleanup(self):
         self.stop_all()
-        if self.pwm_a:
-            self.pwm_a.stop()
-        if self.pwm_b:
-            self.pwm_b.stop()
-        GPIO.cleanup()
 
-    @staticmethod
-    def _set_speed(pwm, speed):
-        if pwm is None:
-            return
+    def _set_speed(self, pin, speed):
         speed = max(0, min(100, speed))
-        pwm.ChangeDutyCycle(speed)
+        duty = speed  # lgpio expects duty cycle in %
+        lgpio.tx_pwm(self.h, pin, self.pwm_freq, duty)
