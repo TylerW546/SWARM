@@ -9,18 +9,21 @@ PORT = '/dev/ttyAMA0'  # or 'COM3' on Windows
 BAUDRATE = 115200
 
 ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-
 # Try reading initial data in a loop to check if firmware is responding
 print("Checking for firmware response...")
 while True:
-    if ser.in_waiting > 0:
-        line = ser.readline().decode('utf-8').strip()
-        print(f"Received: {line}")
-        if "Firmware Version" in line:
-            print("Firmware is responding!")
-            break
-    else:
-        print("No response yet, retrying...")
+    try:
+        if ser.in_waiting > 0:
+            line = ser.readline().decode('utf-8').strip()
+            print(f"Received: {line}")
+            if "Firmware Version" in line:
+                print("Firmware is responding!")
+                break   
+        else:
+            print("No response yet, retrying...")
+    except OSError as e:
+        print(f"Serial I/O error: {e}")
+
     time.sleep(1)
 
 this_vehicle = Vehicle()
