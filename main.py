@@ -23,6 +23,8 @@ while True:
             print("No response yet, retrying...")
     except OSError as e:
         print(f"Serial I/O error: {e}")
+        ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+        
 
     time.sleep(1)
 
