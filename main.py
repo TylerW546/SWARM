@@ -5,28 +5,42 @@ from Vehicle import Vehicle
 import serial
 
 # Replace with your serial port
-PORT = '/dev/ttyAMA0'  # or 'COM3' on Windows
+SERIAL_PORT = '/dev/ttyAMA0'
 BAUDRATE = 115200
 
-ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-# Try reading initial data in a loop to check if firmware is responding
-print("Checking for firmware response...")
+def open_serial():
+    while True:
+        try:
+            ser = serial.Serial(
+                SERIAL_PORT,
+                BAUDRATE,
+                timeout=1,        # 1 second timeout
+                write_timeout=1
+            )
+            print(f"Serial port {SERIAL_PORT} opened.")
+            return ser
+        except Exception as e:
+            print(f"Failed to open serial port: {e}")
+            time.sleep(2)
+
+ser = open_serial()
+
 while True:
     try:
         if ser.in_waiting > 0:
-            line = ser.readline().decode('utf-8').strip()
+            line = ser.readline().decode(errors="ignore").strip()
             print(f"Received: {line}")
-            if "Firmware Version" in line:
-                print("Firmware is responding!")
-                break   
         else:
             print("No response yet, retrying...")
+            time.sleep(0.2)
     except OSError as e:
         print(f"Serial I/O error: {e}")
-        ser = serial.Serial(PORT, BAUDRATE, timeout=1)
-        
-
-    time.sleep(1)
+        try:
+            ser.close()
+        except:
+            pass
+        time.sleep(1)
+        ser = open_serial()
 
 this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
