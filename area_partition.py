@@ -25,11 +25,11 @@ def partition_space_recursive(rovers, area): #partition based on 3 rovers in lis
         return
     split_vertically = (area.width > area.height)
     if split_vertically:
-        mid = area.x_min + area.width / 2
+        split_point = area.x_min + area.width / (len(rovers))
         area_a = SearchArea(area.x_min, area.y_min, mid, area.y_max)
         area_b = SearchArea(mid, area.y_min, area.x_max, area.y_max)
     else:
-        mid = area.y_min + area.height / 2
+        split_point = area.x_min + area.width / (len(rovers))
         area_a = SearchArea(area.x_min, area.y_min, area.x_max, mid)
         area_b = SearchArea(area.x_min, mid, area.x_max, area.y_max)
     
