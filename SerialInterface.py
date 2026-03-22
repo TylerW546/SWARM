@@ -17,6 +17,7 @@ class SerialInterface:
         try:
             self.ser.write((message + '\n').encode())
             print(f"Sent: {message}")
+            return True
         except OSError as e:
             print(f"Serial I/O error: {e}")
             try:
@@ -25,6 +26,7 @@ class SerialInterface:
                 pass
             time.sleep(1)
             self.ser = self.open_serial()
+            return False
 
     def open_serial(self):
         while True:
@@ -45,9 +47,8 @@ class SerialInterface:
         try:
             if self.ser.in_waiting > 0:
                 line = self.ser.readline().decode(errors="ignore").strip()
-                print(f"Received: {line}")
+                self.lines_read.append(line)
             else:
-                print("No response yet, retrying...")
                 time.sleep(0.2)
         except OSError as e:
             print(f"Serial I/O error: {e}")
@@ -59,8 +60,8 @@ class SerialInterface:
             self.ser = self.open_serial()
 
         for message in self.to_send_queue:
-            self.send_message(message)
-            self.to_send_queue.remove(message)
+            if self.send_message(message):
+                self.to_send_queue.remove(message)
 
     def add_to_send_queue(self, message):
         self.to_send_queue.append(message)

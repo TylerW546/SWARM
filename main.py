@@ -4,17 +4,15 @@ from I2CScan import *
 from Vehicle import Vehicle
 import serial
 from SerialInterface import SerialInterface
+from UWBInterface import *
 
 ser = SerialInterface()
-i = 0
-while True:
-    ser.loop()
 
-    if i % 10 == 0:
-        print("Performing periodic tasks...")
-        ser.add_to_send_queue(f"*Periodic message {i//10}~")
+send_uwb_message(ser, "Hello, UWB!")
+send_uwb_message(ser, "Hello, UWB! 2")
 
-    i += 1
+
+
 
     
 this_vehicle = Vehicle()
