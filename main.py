@@ -18,6 +18,7 @@ class State(Enum):
     INIT_DEVICE_DISCOVERY = 1
     INIT_PARENTING = 2
     INIT_CHILD = 3
+    WANDER = 4
 
 state = State.INIT_DEVICE_DISCOVERY
 
@@ -33,7 +34,16 @@ while True:
             else:
                 state = State.INIT_CHILD
         time.sleep(0.2)
+    elif state == State.INIT_PARENTING:
+        print("I am the leader")
 
+
+        state = State.WANDER
+    elif state == State.INIT_CHILD:
+        print("I am a child")
+        state = State.WANDER
+
+    
         # Say "HI, im 0 with hash #, next available index is 1"
         # Listen for responses for a certain amount of time
             # ACK the first response

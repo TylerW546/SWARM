@@ -54,6 +54,4 @@ class UWBInterface:
             else:
                 # Process other messages
                 pass
-
-        print("DISCOVERY COMPLETE: leader? " + str(self.is_leader))
         self.ser.loop()
