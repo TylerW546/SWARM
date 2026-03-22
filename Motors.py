@@ -2,7 +2,8 @@
 # thanks chatgpt
 
 import lgpio
-
+import time
+import math
 
 class L298NMotorDriver:
     """
@@ -68,6 +69,28 @@ class L298NMotorDriver:
         lgpio.gpio_write(self.h, self.in4, 0)
         self._set_speed(self.enb, 0)
 
+    # ---- Rotation ----
+    def rotate_motors(self, duration, speed=100):
+        self.motor_a_forward(self, speed=100)
+        self.motor_b_backward(self, speed=100)
+        time.sleep(duration)
+        self.stop_all()
+
+    def degrees_turn(self, degrees, speed=100):
+        duration = degrees/360
+        rotate_motors(self, duration, speed=100)
+        self.stop_all()
+
+    def move_to_coord(self, dx, dy, speed=100): #(dx dy) = (target position - current position)
+        dist = math.sqrt(dx**2 + dy**2)
+        duration = dist/speed
+        angle = math.atan2(dy,dx) * (180/math.pi)
+        self.degree_turn(self, angle, speed=100)
+        self.motor_a_forward(self, speed=100)
+        self.motor_b_forward(self, speed=100)
+        time.sleep(duration)
+        self.stop_all()
+    
     # ---- Helpers ----
     def stop_all(self):
         self.motor_a_stop()
