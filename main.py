@@ -11,6 +11,8 @@ ser = SerialInterface()
 send_uwb_message(ser, "Hello, UWB!")
 send_uwb_message(ser, "Hello, UWB! 2")
 
+print(ser.to_send_queue)
+
 
 while True:
     ser.loop()
