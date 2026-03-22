@@ -12,8 +12,7 @@ while True:
 
     if i % 10 == 0:
         print("Performing periodic tasks...")
-        ser.add_to_send_queue(f"*Periodic message {i//10}_")
-
+        ser.add_to_send_queue(f"*Periodic message {i//10}~")
 
     i += 1
 
