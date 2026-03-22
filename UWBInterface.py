@@ -1,8 +1,59 @@
-def enter_ranging_mode(ser):
-    ser.add_to_send_queue("*START~")
+import time
+class UWBMessage:
+    regular_message_ID = 0
+    range_id = 0
+    
+    def __init__(self, content, timestamp, id):
+        self.content = content
+        self.timestamp = timestamp
+        self.message_id = id
+        
 
-def send_uwb_message(ser, message):
-    ser.add_to_send_queue(f"*SEND:{message}~")
+class UWBInterface:
+    def __init__(self, ser):
+        self.ser = ser
+        self.messages = []
 
-def enter_listen_mode(ser):
-    ser.add_to_send_queue("*LISTEN~")
+        self.is_discovering = False
+        self.is_leader = False
+
+    def assign_id(self, id):
+        self.ser.add_to_send_queue(f"*ASSIGN_ID~{id}~")
+
+    def enter_discovery_mode(self):
+        self.ser.add_to_send_queue("*DISCOVER~")
+        self.is_discovering = True
+
+    def enter_ranging_mode(self):
+        uwb_message = UWBMessage(content=None, timestamp=time.time(), id=UWBMessage.range_id)
+        self.ser.add_to_send_queue("*RANGE~")
+        return uwb_message
+
+    def send_uwb_message(self, message):
+        uwb_message = UWBMessage(content=message, timestamp=time.time(), id=UWBMessage.regular_message_ID)
+        self.ser.add_to_send_queue(f"*SEND:{uwb_message.message_id},{uwb_message.content}~")
+        return uwb_message
+
+    def enter_listen_mode(self):
+        self.ser.add_to_send_queue("*LISTEN~")
+
+    def check_ack_state(self, message):
+        self.ser.add_to_send_queue(f"*ACK_QUERY:{message.message_id}~")
+
+    def check_ranging_state(self, message):
+        self.ser.add_to_send_queue(f"*RANGE_QUERY:{message.message_id}~")
+
+    def loop(self):
+        for line in self.ser.lines_read:
+            if line.startswith("*DISCOVER_COMPLETE:"):
+                self.is_discovering = False
+                if line.startswith("*DISCOVER_COMPLETE:LEADER"):
+                    self.is_leader = True
+                else:
+                    self.is_leader = False
+            else:
+                # Process other messages
+                pass
+
+        print("DISCOVERY COMPLETE: leader? " + str(self.is_leader))
+        self.ser.loop()
