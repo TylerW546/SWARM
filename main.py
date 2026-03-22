@@ -3,45 +3,21 @@ from IMU import *
 from I2CScan import *
 from Vehicle import Vehicle
 import serial
+from SerialInterface import SerialInterface
 
-# Replace with your serial port
-SERIAL_PORT = '/dev/ttyAMA0'
-BAUDRATE = 115200
-
-def open_serial():
-    while True:
-        try:
-            ser = serial.Serial(
-                SERIAL_PORT,
-                BAUDRATE,
-                timeout=1,        # 1 second timeout
-                write_timeout=1
-            )
-            print(f"Serial port {SERIAL_PORT} opened.")
-            return ser
-        except Exception as e:
-            print(f"Failed to open serial port: {e}")
-            time.sleep(2)
-
-ser = open_serial()
-
+ser = SerialInterface()
+i = 0
 while True:
-    try:
-        if ser.in_waiting > 0:
-            line = ser.readline().decode(errors="ignore").strip()
-            print(f"Received: {line}")
-        else:
-            print("No response yet, retrying...")
-            time.sleep(0.2)
-    except OSError as e:
-        print(f"Serial I/O error: {e}")
-        try:
-            ser.close()
-        except:
-            pass
-        time.sleep(1)
-        ser = open_serial()
+    ser.loop()
 
+    if i % 10 == 0:
+        print("Performing periodic tasks...")
+        ser.add_to_send_queue(f"*Periodic message {i//10}_")
+
+
+    i += 1
+
+    
 this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
 this_vehicle.start_communication_module()
