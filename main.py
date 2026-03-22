@@ -12,7 +12,8 @@ send_uwb_message(ser, "Hello, UWB!")
 send_uwb_message(ser, "Hello, UWB! 2")
 
 
-
+while True:
+    ser.loop()
 
     
 this_vehicle = Vehicle()
