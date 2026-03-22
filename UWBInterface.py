@@ -45,6 +45,7 @@ class UWBInterface:
 
     def loop(self):
         for line in self.ser.lines_read:
+            print(f"Received: {line}")
             if line.startswith("*DISCOVER_COMPLETE:"):
                 self.is_discovering = False
                 if line.startswith("*DISCOVER_COMPLETE:LEADER"):
@@ -54,4 +55,6 @@ class UWBInterface:
             else:
                 # Process other messages
                 pass
+
+            self.ser.lines_read.remove(line)
         self.ser.loop()
