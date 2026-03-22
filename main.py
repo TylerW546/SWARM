@@ -12,7 +12,7 @@ import uuid
 ser = SerialInterface()
 uwb = UWBInterface(ser)
 
-uwb.assign_id(str(uuid.getnode()()))
+uwb.assign_id(str(uuid.getnode()))
 
 class State(Enum):
     INIT_DEVICE_DISCOVERY = 1
