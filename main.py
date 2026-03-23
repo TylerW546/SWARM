@@ -9,67 +9,99 @@ from enum import Enum
 
 import uuid
 
-ser = SerialInterface()
-uwb = UWBInterface(ser)
+def main():
+    ser = SerialInterface()
+    uwb = UWBInterface(ser)
 
-uwb.assign_id(str(uuid.getnode()))
+    uwb.assign_id(str(uuid.getnode()))
 
-class State(Enum):
-    INIT_DEVICE_DISCOVERY = 1
-    INIT_PARENTING = 2
-    INIT_CHILD = 3
-    WANDER = 4
+    class State(Enum):
+        INIT_DEVICE_DISCOVERY = 1
+        INIT_PARENTING = 2
+        INIT_CHILD = 3
+        WANDER = 4
 
-state = State.INIT_DEVICE_DISCOVERY
-
-
-# Device discovery parameters:
-
-uwb.enter_discovery_mode()
-while True:
-    if state == State.INIT_DEVICE_DISCOVERY:
-        if not uwb.is_discovering:
-            if uwb.is_leader:
-                state = State.INIT_PARENTING
-            else:
-                state = State.INIT_CHILD
-        time.sleep(0.2)
-    elif state == State.INIT_PARENTING:
-        print("I am the leader")
+    state = State.INIT_DEVICE_DISCOVERY
 
 
-        state = State.WANDER
-    elif state == State.INIT_CHILD:
-        print("I am a child")
-        state = State.WANDER
+    # Device discovery parameters:
 
-    
-        # Say "HI, im 0 with hash #, next available index is 1"
-        # Listen for responses for a certain amount of time
-            # ACK the first response
-        # If no one responds, exponential back off and listen
-            # If someone says HI, send an acceptance message.
-                 # Hi #, i'll be #, and heres a random hash to confirm: X
-            # wait for them to ack your acceptance message with hash.
-                # If acked, become child.
-                # If not acked, back off and listen again.
-            
-    
-    # run vehicle processes
+    while True:
+        if state == State.INIT_DEVICE_DISCOVERY:
+            if not uwb.is_discovering:
+                uwb.enter_discovery_mode()
 
-    # run communication processes
+            if uwb.finished_discovery:
+                if uwb.is_leader:
+                    state = State.INIT_PARENTING
+                else:
+                    state = State.INIT_CHILD
+                    
+            time.sleep(0.2)
+        elif state == State.INIT_PARENTING:
+            print("I am the leader")
 
+            ## MOVE TO POSITION 1:
+                ## FOR CHILD, SEND RANGE INFO
 
+            ## POSITIONS 2-3:
 
+            ## CHILDREN WILL MOVE
 
-    
-    uwb.loop()
+            ## POSITIONS 4-6:
+                ## SEND RANGE INFO
 
-    
-this_vehicle = Vehicle()
-this_vehicle.start_imu_process()
-this_vehicle.start_communication_module()
-this_vehicle.start_device_discovery()
+            # TELL CHILDREN THEIR CONSTELLATION POSITIONS
+
+            # SEND MORE COMMANDS
+
+            # BREAK, WANDER
+
+            state = State.WANDER
+        elif state == State.INIT_CHILD:
+            print("I am a child")
+
+            ## WAIT FOR RANGE INFO 1
+
+            ## WAIT FOR RANGE INFO 2
+
+            ## WAIT FOR RANGE INFO 3
+
+            ## TRIANGULATE
+
+            ## MOVE
+
+            ## REPEAT ONCE
+
+            ## WAIT FOR LEADER TO ASSIGN POSITION, MOVE TO THAT POSITION
+
+            ## FOLLOW LEADER COMMANDS
+
+            ## IF LEADER SAYS TO WANDER, ENTER WANDER MODE:
+            state = State.WANDER
+
+        
+            # Say "HI, im 0 with hash #, next available index is 1"
+            # Listen for responses for a certain amount of time
+                # ACK the first response
+            # If no one responds, exponential back off and listen
+                # If someone says HI, send an acceptance message.
+                    # Hi #, i'll be #, and heres a random hash to confirm: X
+                # wait for them to ack your acceptance message with hash.
+                    # If acked, become child.
+                    # If not acked, back off and listen again.
+                
+        
+        # run vehicle processes
+
+        # run communication processes
+
+        uwb.loop()
+
+    this_vehicle = Vehicle()
+    this_vehicle.start_imu_process()
+    this_vehicle.start_communication_module()
+    this_vehicle.start_device_discovery()
 
 # Initialization:
 # Create a vehicle object

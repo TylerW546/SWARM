@@ -1,4 +1,6 @@
 import time
+import os
+
 class UWBMessage:
     regular_message_ID = 0
     range_id = 0
@@ -16,6 +18,8 @@ class UWBInterface:
 
         self.is_discovering = False
         self.is_leader = False
+
+        self.requesting_reset = False
 
     def assign_id(self, id):
         self.ser.add_to_send_queue(f"*ASSIGN_ID~{id}~")
@@ -43,17 +47,26 @@ class UWBInterface:
     def check_ranging_state(self, message):
         self.ser.add_to_send_queue(f"*RANGE_QUERY:{message.message_id}~")
 
+    def reset(self):
+        self.is_discovering = False
+        self.finished_discovery = False
+        self.is_leader = False
+        self.messages = []
+        self.ser.reset()
+
     def loop(self):
         for line in self.ser.lines_read:
-            print(f"Received: {line}")
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
+                self.finished_discovery = True
                 if line.startswith("*DISC_COMPLETE:LEADER"):
                     self.is_leader = True
                 else:
                     self.is_leader = False
+            elif line.startswith("*RESET~"):
+                # Process reset message
+                os.execv("./script.sh", ["./script.sh"])
             else:
-                # Process other messages
                 pass
 
             self.ser.lines_read.remove(line)

@@ -10,6 +10,7 @@ class SerialInterface:
         self.baudrate = baudrate
         self.ser = self.open_serial()
 
+
         self.lines_read = []
         self.to_send_queue = []
 
@@ -62,6 +63,7 @@ class SerialInterface:
         for message in self.to_send_queue:
             if self.send_message(message):
                 self.to_send_queue.remove(message)
+
 
     def add_to_send_queue(self, message):
         self.to_send_queue.append(message)
