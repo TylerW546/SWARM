@@ -17,6 +17,7 @@ class UWBInterface:
         self.messages = []
 
         self.is_discovering = False
+        self.finished_discovery = False
         self.is_leader = False
 
         self.requesting_reset = False
