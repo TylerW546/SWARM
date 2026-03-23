@@ -68,7 +68,7 @@ class UWBInterface:
                 # Process reset message
                 try:
                 
-                    os.execv("../start.sh", ["../start.sh"])
+                    os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
                 except Exception as e:
                     print(f"Failed to reset: {e}")
             else:
