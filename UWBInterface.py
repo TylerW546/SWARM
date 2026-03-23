@@ -65,7 +65,7 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
-                os.execv("./script.sh", ["./script.sh"])
+                os.execv("../start.sh", ["../start.sh"])
             else:
                 pass
 
