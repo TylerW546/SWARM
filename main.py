@@ -103,6 +103,9 @@ def main():
     this_vehicle.start_communication_module()
     this_vehicle.start_device_discovery()
 
+if __name__ == "__main__":
+    main()
+
 # Initialization:
 # Create a vehicle object
 
