@@ -66,7 +66,11 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
-                os.execv("../start.sh", ["../start.sh"])
+                try:
+                
+                    os.execv("../start.sh", ["../start.sh"])
+                except Exception as e:
+                    print(f"Failed to reset: {e}")
             else:
                 pass
 
