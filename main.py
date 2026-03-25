@@ -32,13 +32,14 @@ while True:
             uwb.enter_discovery_mode()
 
         if uwb.finished_discovery:
+            uwb.enter_listen_mode()
+            
             if uwb.is_leader:
                 state = State.INIT_PARENTING
             else:
                 state = State.INIT_CHILD
                 
         time.sleep(0.2)
-    uwb.enter_listen_mode()
 
     if uwb.uwb_messages_recieved:
         print("Received UWB messages:")
