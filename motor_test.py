@@ -2,17 +2,17 @@ import lgpio
 from Motors import L298NMotorDriver
 import time
 
-# Left motor
+# Right motor
 IN1 = 17
 IN2 = 27
 ENA = 22 # PWM
-ENCODER_L = 4
+ENCODER_R = 4
 
-# Motor 2
+# Left motor
 IN3 = 23
 IN4 = 24
 ENB = 25 # PWM
-ENCODER_R = 18
+ENCODER_L = 18
 
 # IR sensor
 IR_PIN = 26
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     driver.motor_left_forward(50)
     driver.motor_right_forward(50)
 
-    time.sleep(5)
+    time.sleep(3)
 
     driver.stop_all()
     driver.cleanup()
