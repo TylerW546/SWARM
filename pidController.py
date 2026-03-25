@@ -1,0 +1,142 @@
+from Motors import L298NMotorDriver
+import lgpio
+import time
+
+class pidController:
+    def encoder_left_callback(self, chip, gpio, level, timestamp):
+        self.encoder_count["left"] += 1
+        # print("[left]: Encoder count =", self.encoder_count["left"])
+
+    def encoder_right_callback(self, chip, gpio, level, timestamp):
+        self.encoder_count["right"] += 1
+        # print("[right]: Encoder count =", self.encoder_count["right"])
+
+    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin):
+        self.motor_driver = motor_driver
+        self.encoder_count = {"left": 0, "right": 0}
+        self.speeds = {"left": 0, "right": 0}
+        
+        # --- PID Constants ---
+        self.Kp = 1.5  # Proportional 
+        self.Ki = 0.01 # Integral
+        self.Kd = 0.5  # Derivative
+
+        # --- PID State variables ---
+        self.integral = 0
+        self.prev_error = 0
+
+        # Register callbacks
+        lgpio.gpio_claim_alert(chip, encoder_l_pin, lgpio.RISING_EDGE)
+        self.cb_left = lgpio.callback(chip, encoder_l_pin, lgpio.RISING_EDGE, self.encoder_left_callback)
+
+        lgpio.gpio_claim_alert(chip, encoder_r_pin, lgpio.RISING_EDGE)
+        self.cb_right = lgpio.callback(chip, encoder_r_pin, lgpio.RISING_EDGE, self.encoder_right_callback)
+
+    def straight_forward(self, speed, seconds=5):
+        """
+        Drives the robot straight forward using PID control to balance motor speeds.
+        """
+        # Reset encoder counts and PID state for a clean run
+        self.encoder_count = {"left": 0, "right": 0}
+        self.integral = 0
+        self.prev_error = 0
+
+        # Tell the L298N library to start moving forward
+        self.motor_driver.motor_left_forward(speed)
+        self.motor_driver.motor_right_forward(speed)
+
+        start_time = time.time()
+
+        # The control loop
+        while (time.time() - start_time) < seconds:
+            # 1. Calculate the Error
+            # If positive: Left is spinning faster. If negative: Right is spinning faster.
+            error = self.encoder_count["left"] - self.encoder_count["right"]
+
+            # 2. Calculate PID terms
+            P = self.Kp * error
+            self.integral += error
+            I = self.Ki * self.integral
+            D = self.Kd * (error - self.prev_error)
+
+            # 3. Calculate total adjustment
+            adjustment = P + I + D
+            self.prev_error = error
+
+            # 4. Apply adjustment to the base speeds
+            # If error is positive, we subtract adjustment from left and add to right.
+            left_speed = speed - adjustment
+            right_speed = speed + adjustment
+
+            # 5. Constrain the speeds to your L298N PWM limits (Assuming 0 to 100)
+            left_speed = max(0, min(100, left_speed))
+            right_speed = max(0, min(100, right_speed))
+            print(f"({left_speed}, {right_speed})") 
+
+            # 6. Apply the new speeds to the motors
+            self.motor_driver.motor_left_forward(left_speed)
+            self.motor_driver.motor_right_forward(right_speed)
+
+            # 7. Pause briefly to dictate the loop rate (dt)
+            time.sleep(0.05)
+
+        # Stop the robot when the duration is up
+        self.motor_driver.stop_all()
+        print("Movement complete. Final Encoder Counts:", self.encoder_count)
+
+    def rotate_right(self, degrees):
+        """
+        Drives the robot straight forward using PID control to balance motor speeds.
+        """
+        # Reset encoder counts and PID state for a clean run
+        self.encoder_count = {"left": 0, "right": 0}
+        self.integral = 0
+        self.prev_error = 0
+
+        TURN_SPEED = 30
+
+        start_time = time.time()
+
+        # Time to spend turning
+        seconds = degrees/120
+
+        # Tell the L298N library to start rotating
+        self.motor_driver.motor_left_forward(TURN_SPEED)
+        self.motor_driver.motor_right_backward(TURN_SPEED)
+
+        # The control loop
+        while (time.time() - start_time) < seconds:
+            # 1. Calculate the Error
+            # If positive: Left is spinning faster. If negative: Right is spinning faster.
+            error = self.encoder_count["left"] - self.encoder_count["right"]
+
+            # 2. Calculate PID terms
+            P = self.Kp * error
+            self.integral += error
+            I = self.Ki * self.integral
+            D = self.Kd * (error - self.prev_error)
+
+            # 3. Calculate total adjustment
+            adjustment = P + I + D
+            self.prev_error = error
+
+            # 4. Apply adjustment to the base speeds
+            # If error is positive, we subtract adjustment from left and add to right.
+            left_speed = TURN_SPEED - adjustment
+            right_speed = TURN_SPEED + adjustment
+
+            # 5. Constrain the speeds to your L298N PWM limits (Assuming 0 to 100)
+            left_speed = max(0, min(100, left_speed))
+            right_speed = max(0, min(100, right_speed))
+            print(f"({left_speed}, {right_speed})") 
+
+            # 6. Apply the new speeds to the motors
+            self.motor_driver.motor_left_forward(left_speed)
+            self.motor_driver.motor_right_backward(right_speed)
+
+            # 7. Pause briefly to dictate the loop rate (dt)
+            time.sleep(0.01)
+
+        # Stop the robot when the duration is up
+        self.motor_driver.stop_all()
+        print("Movement complete. Final Encoder Counts:", self.encoder_count)
