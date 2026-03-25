@@ -57,6 +57,7 @@ class UWBInterface:
 
     def loop(self):
         for line in self.ser.lines_read:
+            print(f"Processing line: {line}")
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
                 self.finished_discovery = True
