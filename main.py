@@ -28,6 +28,7 @@ state = State.INIT_DEVICE_DISCOVERY
 while True:
     if state == State.INIT_DEVICE_DISCOVERY:
         if not uwb.is_discovering:
+            uwb.send_uwb_message("RESETTING")
             uwb.enter_discovery_mode()
 
         if uwb.finished_discovery:
@@ -37,58 +38,67 @@ while True:
                 state = State.INIT_CHILD
                 
         time.sleep(0.2)
-    elif state == State.INIT_PARENTING:
-        print("I am the leader")
+    uwb.enter_listen_mode()
 
-        ## MOVE TO POSITION 1:
-            ## FOR CHILD, SEND RANGE INFO
+    if uwb.uwb_messages_recieved:
+        print("Received UWB messages:")
+        for msg in uwb.uwb_messages_recieved:
+            print(msg)
+            if msg == "RESETTING":
+                print("Other just reset, starting...")
+        uwb.uwb_messages_recieved = []
+    # elif state == State.INIT_PARENTING:
+    #     print("I am the leader")
 
-        ## POSITIONS 2-3:
+    #     ## MOVE TO POSITION 1:
+    #         ## FOR CHILD, SEND RANGE INFO
 
-        ## CHILDREN WILL MOVE
+    #     ## POSITIONS 2-3:
 
-        ## POSITIONS 4-6:
-            ## SEND RANGE INFO
+    #     ## CHILDREN WILL MOVE
 
-        # TELL CHILDREN THEIR CONSTELLATION POSITIONS
+    #     ## POSITIONS 4-6:
+    #         ## SEND RANGE INFO
 
-        # SEND MORE COMMANDS
+    #     # TELL CHILDREN THEIR CONSTELLATION POSITIONS
 
-        # BREAK, WANDER
+    #     # SEND MORE COMMANDS
 
-        state = State.WANDER
-    elif state == State.INIT_CHILD:
-        print("I am a child")
+    #     # BREAK, WANDER
 
-        ## WAIT FOR RANGE INFO 1
+    #     state = State.WANDER
+    # elif state == State.INIT_CHILD:
+    #     print("I am a child")
 
-        ## WAIT FOR RANGE INFO 2
+    #     ## WAIT FOR RANGE INFO 1
 
-        ## WAIT FOR RANGE INFO 3
+    #     ## WAIT FOR RANGE INFO 2
 
-        ## TRIANGULATE
+    #     ## WAIT FOR RANGE INFO 3
 
-        ## MOVE
+    #     ## TRIANGULATE
 
-        ## REPEAT ONCE
+    #     ## MOVE
 
-        ## WAIT FOR LEADER TO ASSIGN POSITION, MOVE TO THAT POSITION
+    #     ## REPEAT ONCE
 
-        ## FOLLOW LEADER COMMANDS
+    #     ## WAIT FOR LEADER TO ASSIGN POSITION, MOVE TO THAT POSITION
 
-        ## IF LEADER SAYS TO WANDER, ENTER WANDER MODE:
-        state = State.WANDER
+    #     ## FOLLOW LEADER COMMANDS
+
+    #     ## IF LEADER SAYS TO WANDER, ENTER WANDER MODE:
+    #     state = State.WANDER
 
     
-        # Say "HI, im 0 with hash #, next available index is 1"
-        # Listen for responses for a certain amount of time
-            # ACK the first response
-        # If no one responds, exponential back off and listen
-            # If someone says HI, send an acceptance message.
-                # Hi #, i'll be #, and heres a random hash to confirm: X
-            # wait for them to ack your acceptance message with hash.
-                # If acked, become child.
-                # If not acked, back off and listen again.
+    #     # Say "HI, im 0 with hash #, next available index is 1"
+    #     # Listen for responses for a certain amount of time
+    #         # ACK the first response
+    #     # If no one responds, exponential back off and listen
+    #         # If someone says HI, send an acceptance message.
+    #             # Hi #, i'll be #, and heres a random hash to confirm: X
+    #         # wait for them to ack your acceptance message with hash.
+    #             # If acked, become child.
+    #             # If not acked, back off and listen again.
             
     
     # run vehicle processes

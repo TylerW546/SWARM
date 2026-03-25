@@ -14,13 +14,14 @@ class UWBMessage:
 class UWBInterface:
     def __init__(self, ser):
         self.ser = ser
-        self.messages = []
 
         self.is_discovering = False
         self.finished_discovery = False
         self.is_leader = False
+        self.messages = []
+        
+        self.uwb_messages_recieved = []
 
-        self.requesting_reset = False
 
     def assign_id(self, id):
         self.ser.add_to_send_queue(f"*ASSIGN_ID~{id}~")
@@ -49,11 +50,10 @@ class UWBInterface:
         self.ser.add_to_send_queue(f"*RANGE_QUERY:{message.message_id}~")
 
     def reset(self):
-        self.is_discovering = False
-        self.finished_discovery = False
-        self.is_leader = False
-        self.messages = []
-        self.ser.reset()
+        try:
+            os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
+        except Exception as e:
+            print(f"Failed to reset: {e}")
 
     def loop(self):
         for line in self.ser.lines_read:
@@ -66,13 +66,10 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
-                try:
-                
-                    os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
-                except Exception as e:
-                    print(f"Failed to reset: {e}")
-            else:
-                pass
+                self.reset()
+            elif line.startswith("*REC:"):
+                # Process range response
+                self.uwb_messages_recieved.append(line[5:-1])
 
             self.ser.lines_read.remove(line)
         self.ser.loop()
