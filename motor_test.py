@@ -2,20 +2,20 @@ import lgpio
 from Motors import L298NMotorDriver
 import time
 
-# Motor 1
+# Right motor
 IN1 = 17
 IN2 = 27
-ENA = 12 # PWM
-ENCODER1 = 23
+ENA = 22 # PWM
+ENCODER_R = 4
 
-# Motor 2
+# Left motor
 IN3 = 23
 IN4 = 24
-ENB = 13 # PWM
-# TODO: other encoder
+ENB = 25 # PWM
+ENCODER_L = 18
 
 # IR sensor
-IR_PIN = 22
+IR_PIN = 26
 
 if __name__ == "__main__":
 
@@ -29,30 +29,40 @@ if __name__ == "__main__":
         in3=IN3, in4=IN4, enb=ENB,
     )
 
-    encoder_count = [0] # Will need to define two callbacks (L/R motor)
+    encoder_count = {"left": 0, "right": 0}
 
-    def encoder_callback(chip, gpio, level, timestamp):
-        encoder_count[0] += 1
-        print("Encoder count:", encoder_count[0])
+    def encoder_left_callback(chip, gpio, level, timestamp):
+        encoder_count["left"] += 1
+        print("[left]: Encoder count =", encoder_count["left"])
+
+    def encoder_right_callback(chip, gpio, level, timestamp):
+        encoder_count["right"] += 1
+        print("[right]: Encoder count =", encoder_count["right"])
 
     # Callback for IR sensor
     def ir_callback(chip, gpio, level, timestamp):
         if level == 0: # Falling edge (1 -> 0)
             print("Object detected!!")
-            driver.motor_a_backward(50)
+            driver.motor_left_backward(50)
+            driver.motor_right_backward(50)
         else:
             print("Object gone!!")
-            driver.motor_a_forward(50)
+            driver.motor_left_forward(50)
+            driver.motor_right_forward(50)
 
-    lgpio.gpio_claim_alert(chip, ENCODER1, lgpio.RISING_EDGE)
-    cb = lgpio.callback(chip, ENCODER1, lgpio.RISING_EDGE, encoder_callback)
+    lgpio.gpio_claim_alert(chip, ENCODER_L, lgpio.RISING_EDGE)
+    cb = lgpio.callback(chip, ENCODER_L, lgpio.RISING_EDGE, encoder_left_callback)
+
+    lgpio.gpio_claim_alert(chip, ENCODER_R, lgpio.RISING_EDGE)
+    cb = lgpio.callback(chip, ENCODER_R, lgpio.RISING_EDGE, encoder_right_callback)
 
     lgpio.gpio_claim_alert(chip, IR_PIN, lgpio.BOTH_EDGES)
     cb = lgpio.callback(chip, IR_PIN, lgpio.BOTH_EDGES, ir_callback)
 
-    driver.motor_a_forward(50)
+    driver.motor_left_forward(50)
+    driver.motor_right_forward(50)
 
-    time.sleep(30)
+    time.sleep(3)
 
     driver.stop_all()
     driver.cleanup()

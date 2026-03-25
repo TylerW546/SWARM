@@ -19,11 +19,15 @@ class L298NMotorDriver:
         pwm_freq=1000
     ):
         self.h = chip
+
+        # Left motor
         self.in1 = in1
         self.in2 = in2
+        self.ena = ena
+
+        # Right motor
         self.in3 = in3
         self.in4 = in4
-        self.ena = ena
         self.enb = enb
         self.pwm_freq = pwm_freq
 
@@ -37,42 +41,42 @@ class L298NMotorDriver:
         self._set_speed(self.ena, 0)
         self._set_speed(self.enb, 0)
 
-    # ---- Motor A ----
-    def motor_a_forward(self, speed=100):
+    # ---- Motor left ----
+    def motor_left_forward(self, speed=100):
         lgpio.gpio_write(self.h, self.in1, 1)
         lgpio.gpio_write(self.h, self.in2, 0)
         self._set_speed(self.ena, speed)
 
-    def motor_a_backward(self, speed=100):
+    def motor_left_backward(self, speed=100):
         lgpio.gpio_write(self.h, self.in1, 0)
         lgpio.gpio_write(self.h, self.in2, 1)
         self._set_speed(self.ena, speed)
 
-    def motor_a_stop(self):
+    def motor_left_stop(self):
         lgpio.gpio_write(self.h, self.in1, 0)
         lgpio.gpio_write(self.h, self.in2, 0)
         self._set_speed(self.ena, 0)
 
-    # ---- Motor B ----
-    def motor_b_forward(self, speed=100):
+    # ---- Motor right ----
+    def motor_right_forward(self, speed=100):
         lgpio.gpio_write(self.h, self.in3, 1)
         lgpio.gpio_write(self.h, self.in4, 0)
         self._set_speed(self.enb, speed)
 
-    def motor_b_backward(self, speed=100):
+    def motor_right_backward(self, speed=100):
         lgpio.gpio_write(self.h, self.in3, 0)
         lgpio.gpio_write(self.h, self.in4, 1)
         self._set_speed(self.enb, speed)
 
-    def motor_b_stop(self):
+    def motor_right_stop(self):
         lgpio.gpio_write(self.h, self.in3, 0)
         lgpio.gpio_write(self.h, self.in4, 0)
         self._set_speed(self.enb, 0)
 
     # ---- Rotation ----
     def rotate_motors(self, duration, speed=100):
-        self.motor_a_forward(self, speed=100)
-        self.motor_b_backward(self, speed=100)
+        self.motor_left_forward(self, speed=100)
+        self.motor_right_backward(self, speed=100)
         time.sleep(duration)
         self.stop_all()
 
@@ -86,15 +90,15 @@ class L298NMotorDriver:
         duration = dist/speed
         angle = math.atan2(dy,dx) * (180/math.pi)
         self.degree_turn(self, angle, speed=100)
-        self.motor_a_forward(self, speed=100)
-        self.motor_b_forward(self, speed=100)
+        self.motor_left_forward(self, speed=100)
+        self.motor_right_forward(self, speed=100)
         time.sleep(duration)
         self.stop_all()
     
     # ---- Helpers ----
     def stop_all(self):
-        self.motor_a_stop()
-        self.motor_b_stop()
+        self.motor_left_stop()
+        self.motor_right_stop()
 
     def cleanup(self):
         self.stop_all()
