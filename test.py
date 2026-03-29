@@ -1,18 +1,18 @@
 import lgpio
 from Motors import L298NMotorDriver
-import time
+from pidController import pidController
 
 # Right motor
 IN1 = 17
 IN2 = 27
 ENA = 22 # PWM
-ENCODER_R = 4
+ENCODER_R = 18
 
 # Left motor
 IN3 = 23
 IN4 = 24
 ENB = 25 # PWM
-ENCODER_L = 18
+ENCODER_L = 4
 
 # IR sensor
 IR_PIN = 26
@@ -29,10 +29,9 @@ if __name__ == "__main__":
         in3=IN3, in4=IN4, enb=ENB,
     )
 
-    driver.motor_left_forward(40)
-    driver.motor_right_forward(40)
+    pid = pidController(chip, driver, ENCODER_L, ENCODER_R)
 
-    time.sleep(3)
-
+    pid.straight_forward(speed=30, seconds=2)
+    pid.rotate_right(180) # degrees
     driver.stop_all()
     driver.cleanup()
