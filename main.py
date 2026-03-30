@@ -28,7 +28,6 @@ def get_ip():
         s.close()
     return ip
 local_ip = get_ip()
-print("Local IP:", local_ip)
 uwb.ser.add_to_send_queue(f"*MY_IP={local_ip}~")
 
 class State(Enum):
@@ -50,7 +49,7 @@ while True:
 
         if uwb.finished_discovery:
             #uwb.enter_listen_mode()
-            run_test()
+            # run_test()
             if uwb.is_leader:
                 state = State.INIT_PARENTING
             else:
