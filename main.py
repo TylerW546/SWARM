@@ -6,6 +6,7 @@ import serial
 from SerialInterface import SerialInterface
 from UWBInterface import *
 from enum import Enum 
+from test import *
 
 import uuid
 
@@ -40,6 +41,9 @@ while True:
                 state = State.INIT_CHILD
                 
         time.sleep(0.2)
+    elif state == State.INIT_PARENTING or state == State.INIT_CHILD:
+        run_test()
+        
 
     if uwb.uwb_messages_recieved:
         print("Received UWB messages:")
