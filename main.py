@@ -33,16 +33,15 @@ while True:
             uwb.enter_discovery_mode()
 
         if uwb.finished_discovery:
-            uwb.enter_listen_mode()
-            
+            #uwb.enter_listen_mode()
+            run_test()
             if uwb.is_leader:
                 state = State.INIT_PARENTING
             else:
                 state = State.INIT_CHILD
                 
         time.sleep(0.2)
-    elif state == State.INIT_PARENTING or state == State.INIT_CHILD:
-        run_test()
+    
         
 
     if uwb.uwb_messages_recieved:
