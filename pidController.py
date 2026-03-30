@@ -4,11 +4,6 @@ from Motors import L298NMotorDriver
 import lgpio
 import time
 
-# Wheel circumference in meters
-WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # 2 pi r !!
-ENCODER_COUNT = 20 # Count for one rotation
-DISTANCE_FACTOR_M = WHEEL_CIRC_METERS / ENCODER_COUNT
-
 class pidController:
     def encoder_left_callback(self, chip, gpio, level, timestamp):
         self.encoder_count["left"] += 1
@@ -39,7 +34,9 @@ class pidController:
         lgpio.gpio_claim_alert(chip, encoder_r_pin, lgpio.RISING_EDGE)
         self.cb_right = lgpio.callback(chip, encoder_r_pin, lgpio.RISING_EDGE, self.encoder_right_callback)
 
-    def drive_straight(self, speed, meters):
+    # TODO: take distance as an argument instead of time and use encoder counts
+    # to move the correct amount
+    def straight_forward(self, speed, seconds=5):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
@@ -48,17 +45,14 @@ class pidController:
         self.integral = 0
         self.prev_error = 0
 
-        # Tell the L298N library to start moving
-        self.motor_driver.motor_left_rotate(speed)
-        self.motor_driver.motor_right_rotate(speed)
+        # Tell the L298N library to start moving forward
+        self.motor_driver.motor_left_forward(speed)
+        self.motor_driver.motor_right_forward(speed)
 
         start_time = time.time()
 
-        counts = (self.encoder_count["left"] + self.encoder_count["right"]) // 2
-        distance = 0
-
         # The control loop
-        while (counts * DISTANCE_FACTOR_M) < meters:
+        while (time.time() - start_time) < seconds:
             # 1. Calculate the Error
             # If positive: Left is spinning faster. If negative: Right is spinning faster.
             error = self.encoder_count["left"] - self.encoder_count["right"]
@@ -71,16 +65,16 @@ class pidController:
 
             # 3. Calculate total adjustment
             adjustment = P + I + D
-            adjustment = -adjustment if speed < 0 else adjustment
             self.prev_error = error
 
             # 4. Apply adjustment to the base speeds
+            # If error is positive, we subtract adjustment from left and add to right.
             left_speed = speed - adjustment
             right_speed = speed + adjustment
 
             # 5. Constrain the speeds to your L298N PWM limits (Assuming 0 to 100)
-            left_speed = max(-100, min(100, left_speed))
-            right_speed = max(-100, min(100, right_speed))
+            left_speed = max(0, min(100, left_speed))
+            right_speed = max(0, min(100, right_speed))
             print(f"({left_speed}, {right_speed})") 
 
             # 6. Apply the new speeds to the motors
