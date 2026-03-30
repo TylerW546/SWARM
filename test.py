@@ -33,10 +33,10 @@ def run_test():
     pid = pidController(chip, driver, ENCODER_L, ENCODER_R)
 
     for _ in range(4):
-        
-        pid.straight_forward(speed=50, seconds=2)
+
+        pid.move_straight(speed=50, seconds=2) # forward
         time.sleep(0.5)
-        pid.straight_backward(speed=50, seconds=2)
+        pid.move_straight(speed=-50, seconds=2) # backward
         time.sleep(0.5)
         pid.rotate_right(90) # degrees
         time.sleep(0.5)

@@ -42,68 +42,72 @@ class L298NMotorDriver:
         self._set_speed(self.enb, 0)
 
     # ---- Motor left ----
-    def motor_left_forward(self, speed=100):
-        lgpio.gpio_write(self.h, self.in1, 1)
-        lgpio.gpio_write(self.h, self.in2, 0)
-        self._set_speed(self.ena, speed)
+    def motor_left_rotate(self, speed):
+        if (speed > 0):
+            # Forward
+            lgpio.gpio_write(self.h, self.in1, 1)
+            lgpio.gpio_write(self.h, self.in2, 0)
+            self._set_speed(self.ena, speed)
+        else:
+            # Backward
+            lgpio.gpio_write(self.h, self.in1, 0)
+            lgpio.gpio_write(self.h, self.in2, 1)
+            self._set_speed(self.ena, speed)
 
-    def motor_left_backward(self, speed=100):
-        lgpio.gpio_write(self.h, self.in1, 0)
-        lgpio.gpio_write(self.h, self.in2, 1)
-        self._set_speed(self.ena, speed)
-
-    def motor_left_stop(self):
+    def motor_left_coast(self):
+        # Let motor coast by not powering it
         lgpio.gpio_write(self.h, self.in1, 0)
         lgpio.gpio_write(self.h, self.in2, 0)
         self._set_speed(self.ena, 0)
 
-    # ---- Motor right ----
-    def motor_right_forward(self, speed=100):
-        lgpio.gpio_write(self.h, self.in3, 1)
-        lgpio.gpio_write(self.h, self.in4, 0)
-        self._set_speed(self.enb, speed)
+    def motor_left_stop(self):
+        # Drive motors to stop using brake mode
+        lgpio.gpio_write(self.h, self.in1, 1)
+        lgpio.gpio_write(self.h, self.in2, 1)
+        self._set_speed(self.ena, 1)
 
-    def motor_right_backward(self, speed=100):
-        lgpio.gpio_write(self.h, self.in3, 0)
-        lgpio.gpio_write(self.h, self.in4, 1)
-        self._set_speed(self.enb, speed)
+    # ---- Motor right ----
+    def motor_right_rotate(self, speed):
+        if (speed > 0):
+            # Forward
+            lgpio.gpio_write(self.h, self.in3, 1)
+            lgpio.gpio_write(self.h, self.in4, 0)
+            self._set_speed(self.enb, speed)
+        else:
+            # Backward
+            lgpio.gpio_write(self.h, self.in3, 0)
+            lgpio.gpio_write(self.h, self.in4, 1)
+            self._set_speed(self.enb, speed)
 
     def motor_right_stop(self):
+        # Drive motors to stop using brake mode
+        lgpio.gpio_write(self.h, self.in3, 1)
+        lgpio.gpio_write(self.h, self.in4, 1)
+        self._set_speed(self.enb, 1)
+
+    def motor_right_coast(self):
         lgpio.gpio_write(self.h, self.in3, 0)
         lgpio.gpio_write(self.h, self.in4, 0)
         self._set_speed(self.enb, 0)
 
     # ---- Rotation ----
-    def rotate_motors(self, duration, speed=100):
-        self.motor_left_forward(self, speed=100)
-        self.motor_right_backward(self, speed=100)
+    def rotate_motors(self, duration, speed):
+        self.motor_left_forward(self, speed)
+        self.motor_right_backward(self, speed)
         time.sleep(duration)
         self.stop_all()
 
-    def degrees_turn(self, degrees, speed=100):
-        duration = degrees/360
-        rotate_motors(self, duration, speed=100)
-        self.stop_all()
-
-    def move_to_coord(self, dx, dy, speed=100): #(dx dy) = (target position - current position)
-        dist = math.sqrt(dx**2 + dy**2)
-        duration = dist/speed
-        angle = math.atan2(dy,dx) * (180/math.pi)
-        self.degree_turn(self, angle, speed=100)
-        self.motor_left_forward(self, speed=100)
-        self.motor_right_forward(self, speed=100)
-        time.sleep(duration)
-        self.stop_all()
-    
     # ---- Helpers ----
     def stop_all(self):
         self.motor_left_stop()
         self.motor_right_stop()
 
     def cleanup(self):
-        self.stop_all()
+        self.motor_left_coast()
+        self.motor_right_coast()
 
     def _set_speed(self, pin, speed):
+        speed = abs(speed)
         speed = max(0, min(100, speed))
         duty = speed  # lgpio expects duty cycle in %
         lgpio.tx_pwm(self.h, pin, self.pwm_freq, duty)
