@@ -48,7 +48,7 @@ while True:
             uwb.enter_discovery_mode()
 
         if uwb.finished_discovery:
-            #uwb.enter_listen_mode()
+            uwb.enter_listen_mode()
             # run_test()
             if uwb.is_leader:
                 state = State.INIT_PARENTING
