@@ -58,8 +58,9 @@ while True:
 
     if state == State.INIT_PARENTING:
         run_test()
-        uwb.enter_ranging_mode()
+        # uwb.enter_ranging_mode()
         time.sleep(1)
+        state = State.WANDER
         
     if state == State.INIT_CHILD:
         time.sleep(1)
