@@ -45,6 +45,7 @@ while True:
     if state == State.INIT_DEVICE_DISCOVERY:
         if not uwb.is_discovering and not uwb.finished_discovery:
             uwb.send_uwb_message("RESETTING")
+            uwb.enter_ranging_mode()
             uwb.enter_discovery_mode()
 
         if uwb.finished_discovery:
