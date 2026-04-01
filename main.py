@@ -49,7 +49,6 @@ while True:
 
         if uwb.finished_discovery:
             uwb.enter_listen_mode()
-            # run_test()
             if uwb.is_leader:
                 state = State.INIT_PARENTING
             else:
@@ -58,6 +57,7 @@ while True:
         time.sleep(0.2)
 
     if state == State.INIT_PARENTING:
+        run_test()
         uwb.enter_ranging_mode()
         time.sleep(1)
         
