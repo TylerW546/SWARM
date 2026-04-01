@@ -49,8 +49,6 @@ class SerialInterface:
             if self.ser.in_waiting > 0:
                 line = self.ser.readline().decode(errors="ignore").strip()
                 self.lines_read.append(line)
-            else:
-                time.sleep(0.2)
         except OSError as e:
             print(f"Serial I/O error: {e}")
             try:

@@ -132,6 +132,7 @@ while True:
     # run communication processes
 
     uwb.loop()
+    time.sleep(0.2)
 
 this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
