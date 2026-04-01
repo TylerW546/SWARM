@@ -34,9 +34,9 @@ def run_test():
 
     for _ in range(4):
 
-        pid.move_straight(speed=50, seconds=2) # forward
+        pid.move_straight(speed=50, seconds=1) # forward
         time.sleep(0.5)
-        pid.move_straight(speed=-50, seconds=2) # backward
+        pid.move_straight(speed=-50, seconds=1) # backward
         time.sleep(0.5)
         pid.rotate_right(90) # degrees
         time.sleep(0.5)
