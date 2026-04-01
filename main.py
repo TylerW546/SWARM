@@ -62,7 +62,6 @@ while True:
         time.sleep(1)
         
     if state == State.INIT_CHILD:
-        uwb.enter_ranging_mode()
         time.sleep(1)
         
 
