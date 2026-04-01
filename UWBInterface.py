@@ -19,6 +19,8 @@ class UWBInterface:
         self.finished_discovery = False
         self.is_leader = False
         self.messages = []
+
+        self.is_ranging = False
         
         self.uwb_messages_recieved = []
 
@@ -31,8 +33,12 @@ class UWBInterface:
         self.is_discovering = True
 
     def enter_ranging_mode(self):
+        if self.is_ranging:
+            print("Already ranging, cannot enter ranging mode again.")
+            return None
         uwb_message = UWBMessage(content=None, timestamp=time.time(), id=UWBMessage.range_id)
         self.ser.add_to_send_queue("*RANGE~")
+        self.is_ranging = True
         return uwb_message
 
     def send_uwb_message(self, message):
@@ -71,6 +77,8 @@ class UWBInterface:
             elif line.startswith("*REC:"):
                 # Process range response
                 self.uwb_messages_recieved.append(line[5:-1])
+            elif line.startswith("*DIST:"):
+                self.is_ranging = False
 
             self.ser.lines_read.remove(line)
         self.ser.loop()
