@@ -21,7 +21,9 @@ class State(Enum):
     WANDER = 4
     ACTIVE_SLEEP = 5
 
-
+class MovementState(Enum):
+    IDLE = 1
+    HUB_SPOKE = 2
     
 class PID_State(Enum):
     IDLE = 1

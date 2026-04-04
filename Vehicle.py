@@ -44,6 +44,8 @@ class Vehicle:
         self.chip = lgpio.gpiochip_open(0)
 
         self.movement_queue = []
+        self.movement_state = MovementState.IDLE
+        self.movement_data = {}
 
         # Initialize motor driver
         self.driver = L298NMotorDriver(
@@ -54,24 +56,56 @@ class Vehicle:
         self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, IR_PIN)
 
     def start_test(self):
-        for _ in range(4):
-            self.movement_queue.append(("straight", 30, 1)) # forward
-            self.movement_queue.append(("wait", 0.5)) # wait
-            self.movement_queue.append(("straight", -30, 1)) # backward
-            self.movement_queue.append(("wait", 0.5)) # wait
-            self.movement_queue.append(("rotate_right", 90)) # degrees
-            self.movement_queue.append(("wait", 0.5)) # wait
-
+        self.movement_state = MovementState.HUB_SPOKE
+        self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": None}
 
     def update(self):
-        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
-            command = self.movement_queue.pop(0)
-            if command[0] == "straight":
-                self.pid.move_straight(speed=command[1], seconds=command[2])
-            elif command[0] == "rotate_right":
-                self.pid.rotate_right(degrees=command[1])
-            elif command[0] == "wait":
-                self.pid.wait(seconds=command[1])
+        if self.pid.state == PID_State.IDLE:
+            if self.movement_state == MovementState.HUB_SPOKE:
+                if self.movement_data["current_iteration"] >= self.movement_data["iterations"]:
+                    self.movement_state = MovementState.IDLE
+                    print("Test complete!")
+                else:
+                    commands = [
+                        ("straight", 50, 1), # forward
+                        ("wait", 0, 0.5),
+                        ("straight", -50, 1), # backward
+                        ("wait", 0, 0.5),
+                        ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
+                        ("wait", 0, 0.5),
+                    ]
+                    if self.movement_data["current_command_index"] < len(commands):
+                        command = commands[self.movement_data["current_command_index"]]
+
+                        if self.movement_data["current_command_index"] == 1:
+                            self.movement_data["last_forward_time"] = self.pid.state_values.get("time_elapsed", 0)
+                        if self.movement_data["current_command_index"] == 2:
+                            # Adjust backward time based on how long the forward command took
+                            forward_time = self.movement_data.get("last_forward_time", 1)
+                            command = ("straight", -50, forward_time)
+                                
+                        self.movement_data["current_command_index"] += 1
+                        if command[0] == "straight":
+                            self.pid.move_straight(speed=command[1], seconds=command[2])
+                        elif command[0] == "rotate_right":
+                            self.pid.rotate_right(degrees=command[1])
+                        elif command[0] == "wait":
+                            self.pid.wait(seconds=command[2])
+                    else:
+                        self.movement_data["current_iteration"] += 1
+                        self.movement_data["current_command_index"] = 0
+
+        # if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
+        #     command = self.movement_queue.pop(0)
+        #     if command[0] == "straight":
+        #         self.pid.move_straight(speed=command[1], seconds=command[2])
+        #     elif command[0] == "rotate_right":
+        #         self.pid.rotate_right(degrees=command[1])
+        #     elif command[0] == "wait":
+        #         self.pid.wait(seconds=command[1])
+
+
+
 
         
         self.uwb.update()
