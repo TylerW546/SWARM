@@ -3,6 +3,15 @@
 from Motors import L298NMotorDriver
 import lgpio
 import time
+from enum import Enum 
+
+class State(Enum):
+    IDLE = 1
+    STRAIGHT = 2
+    TURNING_RIGHT = 3
+
+TURN_SPEED = 30
+
 
 class pidController:
     def encoder_left_callback(self, chip, gpio, level, timestamp):
@@ -17,6 +26,9 @@ class pidController:
         self.motor_driver = motor_driver
         self.encoder_count = {"left": 0, "right": 0}
         self.speeds = {"left": 0, "right": 0}
+
+        self.state = State.IDLE
+        self.state_values = {}
         
         # --- PID Constants ---
         self.Kp = 1.5  # Proportional 
@@ -41,53 +53,17 @@ class pidController:
         Drives the robot straight forward using PID control to balance motor speeds.
         """
         # Reset encoder counts and PID state for a clean run
+        
         self.encoder_count = {"left": 0, "right": 0}
         self.integral = 0
         self.prev_error = 0
+        
+        self.state = State.STRAIGHT
+        self.state_values = {"target_speed": speed, "start_time": time.time(), "duration": seconds}
 
         # Tell the L298N library to start moving forward
         self.motor_driver.motor_left_rotate(speed)
         self.motor_driver.motor_right_rotate(speed)
-
-        start_time = time.time()
-
-        # Control loop
-        while (time.time() - start_time) < seconds:
-            # 1. Calculate error
-            # If positive: Left is spinning faster. If negative: Right is spinning faster.
-            error = self.encoder_count["left"] - self.encoder_count["right"]
-
-            # 2. Calculate PID terms
-            P = self.Kp * error
-            self.integral += error
-            I = self.Ki * self.integral
-            D = self.Kd * (error - self.prev_error)
-
-            # 3. Calculate total adjustment
-            adjustment = P + I + D
-            if speed < 0:
-                # Backwards
-                adjustment = -adjustment
-
-            self.prev_error = error
-
-            # 4. Apply adjustment to the base speeds
-            # If error is positive, we subtract adjustment from left and add to right.
-            left_speed = speed - adjustment
-            right_speed = speed + adjustment
-
-            print(f"({left_speed}, {right_speed})") 
-
-            # 5. Apply the new speeds to the motors
-            self.motor_driver.motor_left_rotate(left_speed)
-            self.motor_driver.motor_right_rotate(right_speed)
-
-            # 6. Pause briefly to dictate the loop rate (dt)
-            time.sleep(0.05)
-
-        # Stop the robot when the duration is up
-        self.motor_driver.stop_all()
-        print("Movement complete. Final Encoder Counts:", self.encoder_count)
 
     def rotate_right(self, degrees):
         """
@@ -98,45 +74,99 @@ class pidController:
         self.integral = 0
         self.prev_error = 0
 
-        TURN_SPEED = 30
-
         # Encoder counts to reach
         counts = degrees/6
+
+        self.state = State.TURNING_RIGHT
+        self.state_values = {"counts": counts}
 
         # Tell the L298N library to start rotating
         self.motor_driver.motor_left_rotate(TURN_SPEED)
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
+    
+    def update(self):
+        if self.state == State.STRAIGHT:
+            self.straight_update()
+        elif self.state == State.TURNING_RIGHT:
+            self.rotate_right_update()
+
+    def rotate_right_update(self):
         # The control loop
-        while (self.encoder_count["left"] + self.encoder_count["right"]) < counts:
-            # 1. Calculate the Error
-            # If positive: Left is spinning faster. If negative: Right is spinning faster.
-            error = self.encoder_count["left"] - self.encoder_count["right"]
+        if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
+            self.motor_driver.stop_all()
+            print("Rotation complete. Final Encoder Counts:", self.encoder_count)
+            self.state = State.IDLE
+            return
+    
+        # 1. Calculate the Error
+        # If positive: Left is spinning faster. If negative: Right is spinning faster.
+        error = self.encoder_count["left"] - self.encoder_count["right"]
 
-            # 2. Calculate PID terms
-            P = self.Kp * error
-            self.integral += error
-            I = self.Ki * self.integral
-            D = self.Kd * (error - self.prev_error)
+        # 2. Calculate PID terms
+        P = self.Kp * error
+        self.integral += error
+        I = self.Ki * self.integral
+        D = self.Kd * (error - self.prev_error)
 
-            # 3. Calculate total adjustment
-            adjustment = P + I + D
-            self.prev_error = error
+        # 3. Calculate total adjustment
+        adjustment = P + I + D
+        self.prev_error = error
 
-            # 4. Apply adjustment to the base speeds
-            # If error is positive, we subtract adjustment from left and add to right.
-            left_speed = TURN_SPEED - adjustment
-            right_speed = -(TURN_SPEED + adjustment)
+        # 4. Apply adjustment to the base speeds
+        # If error is positive, we subtract adjustment from left and add to right.
+        left_speed = TURN_SPEED - adjustment
+        right_speed = -(TURN_SPEED + adjustment)
 
-            print(f"({left_speed}, {right_speed})") 
+        print(f"({left_speed}, {right_speed})") 
 
-            # 5. Apply the new speeds to the motors
-            self.motor_driver.motor_left_rotate(left_speed)
-            self.motor_driver.motor_right_rotate(right_speed)
+        # 5. Apply the new speeds to the motors
+        self.motor_driver.motor_left_rotate(left_speed)
+        self.motor_driver.motor_right_rotate(right_speed)
 
-            # 6. Pause briefly to dictate the loop rate (dt)
-            time.sleep(0.05)
 
-        self.motor_driver.stop_all()
-        print("Movement complete. Final Encoder Counts:", self.encoder_count)
+    def straight_update(self):
+        if self.state != State.STRAIGHT:
+            return
 
+        speed = self.state_values["target_speed"]
+        seconds = self.state_values["duration"]
+        start_time = self.state_values["start_time"]
+
+        if (time.time() - start_time) >= seconds:
+            self.motor_driver.stop_all()
+            print("Movement complete. Final Encoder Counts:", self.encoder_count)
+            self.state = State.IDLE
+            return
+    
+        # 1. Calculate error
+        # If positive: Left is spinning faster. If negative: Right is spinning faster.
+        error = self.encoder_count["left"] - self.encoder_count["right"]
+
+        # 2. Calculate PID terms
+        P = self.Kp * error
+        self.integral += error
+        I = self.Ki * self.integral
+        D = self.Kd * (error - self.prev_error)
+
+        # 3. Calculate total adjustment
+        adjustment = P + I + D
+        if speed < 0:
+            # Backwards
+            adjustment = -adjustment
+
+        self.prev_error = error
+
+        # 4. Apply adjustment to the base speeds
+        # If error is positive, we subtract adjustment from left and add to right.
+        left_speed = speed - adjustment
+        right_speed = speed + adjustment
+
+        print(f"({left_speed}, {right_speed})") 
+
+        # 5. Apply the new speeds to the motors
+        self.motor_driver.motor_left_rotate(left_speed)
+        self.motor_driver.motor_right_rotate(right_speed)
+
+    def rotate_right_update(self):
+        pass
