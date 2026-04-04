@@ -27,6 +27,7 @@ while True:
         time.sleep(0.2)
 
     if v.state == State.INIT_PARENTING:
+        print("I am leader")
         v.start_test()
         # uwb.enter_ranging_mode()
         time.sleep(1)

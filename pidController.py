@@ -84,7 +84,6 @@ class pidController:
         self.motor_driver.motor_left_rotate(TURN_SPEED)
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
-    
     def update(self):
         if self.state == State.STRAIGHT:
             self.straight_update()

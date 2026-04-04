@@ -28,8 +28,6 @@ ENCODER_L = 19
 # IR sensor
 IR_PIN = 26
 
-
-
 class Vehicle:
     def __init__(self):
         self.index = 0
@@ -45,6 +43,8 @@ class Vehicle:
         # Initialize gpio
         self.chip = lgpio.gpiochip_open(0)
 
+        self.movement_queue = []
+
         # Initialize motor driver
         self.driver = L298NMotorDriver(
             chip=self.chip,
@@ -55,17 +55,19 @@ class Vehicle:
 
     def start_test(self):
         for _ in range(4):
-            self.pid.move_straight(speed=50, seconds=1) # forward
-            time.sleep(0.5)
-            self.pid.move_straight(speed=-50, seconds=1) # backward
-            time.sleep(0.5)
-            self.pid.rotate_right(90) # degrees
-            time.sleep(0.5)
-        
-        self.driver.stop_all()
-        self.driver.cleanup()
+            self.movement_queue.append(("straight", 50, 1)) # forward
+            self.movement_queue.append(("straight", -50, 1)) # backward
+            self.movement_queue.append(("rotate_right", 90)) # degrees
+
 
     def update(self):
+        if self.pid.state == State.IDLE and len(self.movement_queue) > 0:
+            command = self.movement_queue.pop(0)
+            if command[0] == "straight":
+                self.pid.move_straight(speed=command[1], seconds=command[2])
+            elif command[0] == "rotate_right":
+                self.pid.rotate_right(degrees=command[1])
+        
         self.uwb.update()
         self.pid.update()
         
