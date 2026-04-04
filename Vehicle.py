@@ -66,7 +66,7 @@ class Vehicle:
         self.driver.cleanup()
 
     def update(self):
-        self.uwb.loop()
+        self.uwb.update()
         
     def start_imu_process(self):
         pass
