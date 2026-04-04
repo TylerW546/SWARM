@@ -67,6 +67,7 @@ class Vehicle:
 
     def update(self):
         self.uwb.update()
+        self.pid.update()
         
     def start_imu_process(self):
         pass
