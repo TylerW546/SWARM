@@ -83,7 +83,6 @@ class pidController:
     def update(self):
         if self.state == PID_State.IDLE or self.state == PID_State.WAITING:
             self.motor_driver.stop_all()
-            return
         
         if self.state == PID_State.STRAIGHT:
             self.straight_update()
