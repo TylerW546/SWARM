@@ -105,7 +105,6 @@ class pidController:
     def rotate_right_update(self):
         # The control loop
         if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
-            self.motor_driver.stop_all()
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             return
@@ -145,7 +144,6 @@ class pidController:
         start_time = self.state_values["start_time"]
 
         if (time.time() - start_time) >= seconds:
-            self.motor_driver.stop_all()
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             return
@@ -179,5 +177,3 @@ class pidController:
         self.motor_driver.motor_left_rotate(left_speed)
         self.motor_driver.motor_right_rotate(right_speed)
 
-    def rotate_right_update(self):
-        pass
