@@ -22,10 +22,8 @@ class pidController:
     def ir_callback(self, chip, gpio, level, timestamp):
             if level == 0: # Falling edge (1 -> 0)
                 self.object_detected = True
-                print("Object detected!!")
             else:
                 self.object_detected = False
-                print("Object gone!!")
 
     def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin):
         self.motor_driver = motor_driver

@@ -67,9 +67,9 @@ class Vehicle:
                     print("Test complete!")
                 else:
                     commands = [
-                        ("straight", 50, 1), # forward
+                        ("straight", 30, 1), # forward
                         ("wait", 0, 0.5),
-                        ("straight", -50, 1), # backward
+                        ("straight", -30, 1), # backward
                         ("wait", 0, 0.5),
                         ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
                         ("wait", 0, 0.5),
