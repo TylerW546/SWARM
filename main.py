@@ -1,79 +1,49 @@
 import time
 from IMU import *
 from I2CScan import *
-from Vehicle import Vehicle
-import serial
-from SerialInterface import SerialInterface
-from UWBInterface import *
-from enum import Enum 
+from Vehicle import *
 from test import *
 
-import uuid
 
-ser = SerialInterface()
-uwb = UWBInterface(ser)
-
-uwb.assign_id(str(uuid.getnode()))
-
-import socket
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # doesn't have to be reachable
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-    except Exception:
-        ip = "127.0.0.1"
-    finally:
-        s.close()
-    return ip
-local_ip = get_ip()
-uwb.ser.add_to_send_queue(f"*MY_IP={local_ip}~")
-
-class State(Enum):
-    INIT_DEVICE_DISCOVERY = 1
-    INIT_PARENTING = 2
-    INIT_CHILD = 3
-    WANDER = 4
-
-state = State.INIT_DEVICE_DISCOVERY
 
 
 # Device discovery parameters:
+v = Vehicle()
 
 while True:
-    if state == State.INIT_DEVICE_DISCOVERY:
-        if not uwb.is_discovering and not uwb.finished_discovery:
-            uwb.send_uwb_message("RESETTING")
-            uwb.enter_discovery_mode()
+    
+    if v.state == State.INIT_DEVICE_DISCOVERY:
+        if not v.uwb.is_discovering and not v.uwb.finished_discovery:
+            v.uwb.send_uwb_message("RESETTING")
+            v.uwb.enter_discovery_mode()
 
-        if uwb.finished_discovery:
-            uwb.enter_listen_mode()
-            if uwb.is_leader:
-                state = State.INIT_PARENTING
+        if v.uwb.finished_discovery:
+            v.uwb.enter_listen_mode()
+            if v.uwb.is_leader:
+                v.state = State.INIT_PARENTING
             else:
-                state = State.INIT_CHILD
+                v.state = State.INIT_CHILD
                 
         time.sleep(0.2)
 
-    if state == State.INIT_PARENTING:
-        # run_test()
+    if v.state == State.INIT_PARENTING:
+        v.run_test()
         # uwb.enter_ranging_mode()
         time.sleep(1)
-        state = State.WANDER
+        v.state = State.WANDER
         
-    if state == State.INIT_CHILD:
+    if v.state == State.INIT_CHILD:
         time.sleep(1)
         
 
-    if uwb.uwb_messages_recieved:
+    if v.uwb.uwb_messages_recieved:
         print("Received UWB messages:")
-        for msg in uwb.uwb_messages_recieved:
+        for msg in v.uwb.uwb_messages_recieved:
             print(msg)
             if msg == "RESETTING":
                 print("Other just reset, starting...")
-        uwb.uwb_messages_recieved = []
-    # elif state == State.INIT_PARENTING:
+        v.uwb.uwb_messages_recieved = []
+    # elif v.state == State.INIT_PARENTING:
     #     print("I am the leader")
 
     #     ## MOVE TO POSITION 1:
@@ -92,8 +62,8 @@ while True:
 
     #     # BREAK, WANDER
 
-    #     state = State.WANDER
-    # elif state == State.INIT_CHILD:
+    #     v.state = State.WANDER
+    # elif v.state == State.INIT_CHILD:
     #     print("I am a child")
 
     #     ## WAIT FOR RANGE INFO 1
@@ -131,8 +101,8 @@ while True:
 
     # run communication processes
 
-    uwb.loop()
-    time.sleep(0.2)
+    v.loop()
+    time.sleep(0.05)
 
 this_vehicle = Vehicle()
 this_vehicle.start_imu_process()
