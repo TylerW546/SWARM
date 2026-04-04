@@ -73,8 +73,6 @@ class Vehicle:
             elif command[0] == "wait":
                 self.pid.wait(seconds=command[1])
 
-        if self.pid.state == PID_State.IDLE:
-            self.driver.stop_all()
         
         self.uwb.update()
         self.pid.update()

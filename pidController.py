@@ -81,6 +81,10 @@ class pidController:
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
     def update(self):
+        if self.state == PID_State.IDLE or self.state == PID_State.WAITING:
+            self.motor_driver.stop_all()
+            return
+        
         if self.state == PID_State.STRAIGHT:
             self.straight_update()
         elif self.state == PID_State.TURNING_RIGHT:
