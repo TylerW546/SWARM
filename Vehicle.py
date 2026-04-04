@@ -55,9 +55,9 @@ class Vehicle:
 
     def start_test(self):
         for _ in range(4):
-            self.movement_queue.append(("straight", 50, 1)) # forward
+            self.movement_queue.append(("straight", 30, 1)) # forward
             self.movement_queue.append(("wait", 0.5)) # wait
-            self.movement_queue.append(("straight", -50, 1)) # backward
+            self.movement_queue.append(("straight", -30, 1)) # backward
             self.movement_queue.append(("wait", 0.5)) # wait
             self.movement_queue.append(("rotate_right", 90)) # degrees
             self.movement_queue.append(("wait", 0.5)) # wait
