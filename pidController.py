@@ -22,8 +22,10 @@ class pidController:
     def ir_callback(self, chip, gpio, level, timestamp):
             if level == 0: # Falling edge (1 -> 0)
                 self.object_detected = True
+                print("Object detected!!")
             else:
                 self.object_detected = False
+                print("Object gone!!")
 
     def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin):
         self.motor_driver = motor_driver
@@ -92,6 +94,25 @@ class pidController:
         self.motor_driver.motor_left_rotate(TURN_SPEED)
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
+    def rotate_left(self, degrees):
+        """
+        Drives the robot straight forward using PID control to balance motor speeds.
+        """
+        # Reset encoder counts and PID state for a clean run
+        self.encoder_count = {"left": 0, "right": 0}
+        self.integral = 0
+        self.prev_error = 0
+
+        # Encoder counts to reach
+        counts = degrees/6
+
+        self.state = PID_State.TURNING_RIGHT
+        self.state_values = {"counts": counts}
+
+        # Tell the L298N library to start rotating
+        self.motor_driver.motor_left_rotate(-TURN_SPEED)
+        self.motor_driver.motor_right_rotate(TURN_SPEED)
+
     def update(self):
         if self.state == PID_State.IDLE or self.state == PID_State.WAITING:
             self.motor_driver.stop_all()
@@ -149,6 +170,38 @@ class pidController:
         self.motor_driver.motor_left_rotate(left_speed)
         self.motor_driver.motor_right_rotate(right_speed)
 
+    def rotate_left_update(self):
+        # The control loop
+        if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
+            print("Rotation complete. Final Encoder Counts:", self.encoder_count)
+            self.state = PID_State.IDLE
+            return
+    
+        # 1. Calculate the Error
+        # If positive: Left is spinning faster. If negative: Right is spinning faster.
+        error = self.encoder_count["left"] - self.encoder_count["right"]
+
+        # 2. Calculate PID terms
+        P = self.Kp * error
+        self.integral += error
+        I = self.Ki * self.integral
+        D = self.Kd * (error - self.prev_error)
+
+        # 3. Calculate total adjustment
+        adjustment = P + I + D
+        self.prev_error = error
+
+        # 4. Apply adjustment to the base speeds
+        # If error is positive, we subtract adjustment from left and add to right.
+        left_speed = -(TURN_SPEED - adjustment)
+        right_speed = (TURN_SPEED + adjustment)
+
+        print(f"({left_speed}, {right_speed})") 
+
+        # 5. Apply the new speeds to the motors
+        self.motor_driver.motor_left_rotate(left_speed)
+        self.motor_driver.motor_right_rotate(right_speed)
+
     def straight_update(self):
         if self.state != PID_State.STRAIGHT:
             return
@@ -160,13 +213,13 @@ class pidController:
         if (time.time() - start_time) >= seconds:
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
+            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count}
             return
 
         if self.object_detected and speed > 0: # Only stop if we're moving forward and detect an object
             print("Object detected during straight movement! Stopping.")
             self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
+            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count}
             return
         
         # 1. Calculate error
@@ -196,5 +249,5 @@ class pidController:
 
         # 5. Apply the new speeds to the motors
         self.motor_driver.motor_left_rotate(left_speed)
-        self.motor_driver.motor_right_rotate(right_speed)   
+        self.motor_driver.motor_right_rotate(right_speed)
 
