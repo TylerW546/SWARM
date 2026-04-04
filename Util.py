@@ -20,3 +20,10 @@ class State(Enum):
     INIT_CHILD = 3
     WANDER = 4
     ACTIVE_SLEEP = 5
+
+
+    
+class PID_State(Enum):
+    IDLE = 1
+    STRAIGHT = 2
+    TURNING_RIGHT = 3

@@ -61,7 +61,7 @@ class Vehicle:
 
 
     def update(self):
-        if self.pid.state == State.IDLE and len(self.movement_queue) > 0:
+        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
                 self.pid.move_straight(speed=command[1], seconds=command[2])

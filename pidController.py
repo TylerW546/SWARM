@@ -3,12 +3,8 @@
 from Motors import L298NMotorDriver
 import lgpio
 import time
+from Util import *
 from enum import Enum 
-
-class State(Enum):
-    IDLE = 1
-    STRAIGHT = 2
-    TURNING_RIGHT = 3
 
 TURN_SPEED = 30
 
@@ -27,7 +23,7 @@ class pidController:
         self.encoder_count = {"left": 0, "right": 0}
         self.speeds = {"left": 0, "right": 0}
 
-        self.state = State.IDLE
+        self.state = PID_State.IDLE
         self.state_values = {}
         
         # --- PID Constants ---
@@ -58,7 +54,7 @@ class pidController:
         self.integral = 0
         self.prev_error = 0
         
-        self.state = State.STRAIGHT
+        self.state = PID_State.STRAIGHT
         self.state_values = {"target_speed": speed, "start_time": time.time(), "duration": seconds}
 
         # Tell the L298N library to start moving forward
@@ -77,7 +73,7 @@ class pidController:
         # Encoder counts to reach
         counts = degrees/6
 
-        self.state = State.TURNING_RIGHT
+        self.state = PID_State.TURNING_RIGHT
         self.state_values = {"counts": counts}
 
         # Tell the L298N library to start rotating
@@ -85,9 +81,9 @@ class pidController:
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
     def update(self):
-        if self.state == State.STRAIGHT:
+        if self.state == PID_State.STRAIGHT:
             self.straight_update()
-        elif self.state == State.TURNING_RIGHT:
+        elif self.state == PID_State.TURNING_RIGHT:
             self.rotate_right_update()
 
     def rotate_right_update(self):
@@ -95,7 +91,7 @@ class pidController:
         if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
             self.motor_driver.stop_all()
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
-            self.state = State.IDLE
+            self.state = PID_State.IDLE
             return
     
         # 1. Calculate the Error
@@ -125,7 +121,7 @@ class pidController:
 
 
     def straight_update(self):
-        if self.state != State.STRAIGHT:
+        if self.state != PID_State.STRAIGHT:
             return
 
         speed = self.state_values["target_speed"]
@@ -135,7 +131,7 @@ class pidController:
         if (time.time() - start_time) >= seconds:
             self.motor_driver.stop_all()
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
-            self.state = State.IDLE
+            self.state = PID_State.IDLE
             return
     
         # 1. Calculate error
