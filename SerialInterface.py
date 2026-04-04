@@ -44,7 +44,7 @@ class SerialInterface:
                 print(f"Failed to open serial port: {e}")
                 time.sleep(2)
 
-    def loop(self):
+    def update(self):
         try:
             if self.ser.in_waiting > 0:
                 line = self.ser.readline().decode(errors="ignore").strip()

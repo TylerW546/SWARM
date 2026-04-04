@@ -101,7 +101,7 @@ while True:
 
     # run communication processes
 
-    v.loop()
+    v.update()
     time.sleep(0.05)
 
 this_vehicle = Vehicle()

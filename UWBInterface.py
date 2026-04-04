@@ -61,7 +61,7 @@ class UWBInterface:
         except Exception as e:
             print(f"Failed to reset: {e}")
 
-    def loop(self):
+    def update(self):
         for line in self.ser.lines_read:
             print(f"Processing line: {line}")
             if line.startswith("*DISC_COMPLETE:"):
@@ -81,4 +81,4 @@ class UWBInterface:
                 self.is_ranging = False
 
             self.ser.lines_read.remove(line)
-        self.ser.loop()
+        self.ser.update()
