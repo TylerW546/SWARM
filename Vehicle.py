@@ -56,8 +56,11 @@ class Vehicle:
     def start_test(self):
         for _ in range(4):
             self.movement_queue.append(("straight", 50, 1)) # forward
+            self.movement_queue.append(("wait", 0.5)) # wait
             self.movement_queue.append(("straight", -50, 1)) # backward
+            self.movement_queue.append(("wait", 0.5)) # wait
             self.movement_queue.append(("rotate_right", 90)) # degrees
+            self.movement_queue.append(("wait", 0.5)) # wait
 
 
     def update(self):
@@ -67,6 +70,8 @@ class Vehicle:
                 self.pid.move_straight(speed=command[1], seconds=command[2])
             elif command[0] == "rotate_right":
                 self.pid.rotate_right(degrees=command[1])
+            elif command[0] == "wait":
+                self.pid.wait(seconds=command[1])
         
         self.uwb.update()
         self.pid.update()

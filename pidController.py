@@ -85,6 +85,22 @@ class pidController:
             self.straight_update()
         elif self.state == PID_State.TURNING_RIGHT:
             self.rotate_right_update()
+        elif self.state == PID_State.WAITING:
+            self.wait_update()
+
+    def wait(self, seconds):
+        self.state = PID_State.WAITING
+        self.state_values = {"wait_start": time.time(), "wait_duration": seconds}
+
+    def wait_update(self):
+        if self.state != PID_State.WAITING:
+            return
+        
+        start = self.state_values["wait_start"]
+        duration = self.state_values["wait_duration"]
+
+        if (time.time() - start) >= duration:
+            self.state = PID_State.IDLE
 
     def rotate_right_update(self):
         # The control loop

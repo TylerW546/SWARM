@@ -25,5 +25,6 @@ class State(Enum):
     
 class PID_State(Enum):
     IDLE = 1
-    STRAIGHT = 2
-    TURNING_RIGHT = 3
+    WAITING = 2
+    STRAIGHT = 3
+    TURNING_RIGHT = 4
