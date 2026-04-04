@@ -9,6 +9,7 @@ from enum import Enum
 TURN_SPEED = 30
 
 
+
 class pidController:
     def encoder_left_callback(self, chip, gpio, level, timestamp):
         self.encoder_count["left"] += 1
@@ -18,10 +19,19 @@ class pidController:
         self.encoder_count["right"] += 1
         # print("[right]: Encoder count =", self.encoder_count["right"])
 
-    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin):
+    def ir_callback(self, chip, gpio, level, timestamp):
+            if level == 0: # Falling edge (1 -> 0)
+                self.object_detected = True
+                print("Object detected!!")
+            else:
+                self.object_detected = False
+                print("Object gone!!")
+
+    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin):
         self.motor_driver = motor_driver
         self.encoder_count = {"left": 0, "right": 0}
         self.speeds = {"left": 0, "right": 0}
+        self.object_detected = False
 
         self.state = PID_State.IDLE
         self.state_values = {}
@@ -41,6 +51,10 @@ class pidController:
 
         lgpio.gpio_claim_alert(chip, encoder_r_pin, lgpio.RISING_EDGE)
         self.cb_right = lgpio.callback(chip, encoder_r_pin, lgpio.RISING_EDGE, self.encoder_right_callback)
+
+        lgpio.gpio_claim_alert(chip, ir_pin, lgpio.BOTH_EDGES)
+        self.cb_ir = lgpio.callback(chip, ir_pin, lgpio.BOTH_EDGES, self.ir_callback)
+        
 
     # TODO: take distance as an argument instead of time and use encoder counts
     # to move the correct amount
@@ -137,7 +151,6 @@ class pidController:
         self.motor_driver.motor_left_rotate(left_speed)
         self.motor_driver.motor_right_rotate(right_speed)
 
-
     def straight_update(self):
         if self.state != PID_State.STRAIGHT:
             return
@@ -149,8 +162,15 @@ class pidController:
         if (time.time() - start_time) >= seconds:
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
+            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count}
             return
-    
+
+        if self.object_detected and speed > 0: # Only stop if we're moving forward and detect an object
+            print("Object detected during straight movement! Stopping.")
+            self.state = PID_State.IDLE
+            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count}
+            return
+        
         # 1. Calculate error
         # If positive: Left is spinning faster. If negative: Right is spinning faster.
         error = self.encoder_count["left"] - self.encoder_count["right"]
