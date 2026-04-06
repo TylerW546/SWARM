@@ -57,21 +57,21 @@ class Vehicle:
 
     def start_test(self):
         self.movement_state = MovementState.HUB_SPOKE
-        self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 0}
+        self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
 
     def update(self):
         if self.pid.state == PID_State.IDLE:
             if self.movement_state == MovementState.HUB_SPOKE:
                 self.hub_spoke_movement()
-            if self.movement_state == MovementState.BOUSTROPHEDON:
-                self.boustrophedon_movement()
-                
+
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
                 self.pid.move_straight(speed=command[1], seconds=command[2])
             elif command[0] == "rotate_right":
                 self.pid.rotate_right(degrees=command[1])
+            elif command[0] == "rotate_left":
+                self.pid.rotate_left(degrees=command[1])
             elif command[0] == "wait":
                 self.pid.wait(seconds=command[1])
 
@@ -86,21 +86,21 @@ class Vehicle:
         else:
             commands = [
                 ("straight", 30, 1), # forward
-                ("wait", 0.5),
+                ("wait", 0, 0.5),
                 ("straight", -30, 1), # backward
-                ("wait", 0.5),
+                ("wait", 0, 0.5),
                 ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
-                ("wait", 0.5),
+                ("wait", 0, 0.5),
             ]
             if self.movement_data["current_command_index"] < len(commands):
                 command = commands[self.movement_data["current_command_index"]]
 
                 if self.movement_data["current_command_index"] == 1:
-                    self.movement_data["last_forward_time"] = self.pid.state_values.get("time_elapsed", 1)
+                    self.movement_data["last_forward_time"] = self.pid.state_values.get("time_elapsed", 0)
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
                     forward_time = self.movement_data.get("last_forward_time", 1)
-                    command = ("straight", -30, forward_time)
+                    command = ("straight", -50, forward_time)
                         
                 self.movement_data["current_command_index"] += 1
                 if command[0] == "straight":
@@ -173,14 +173,3 @@ class Vehicle:
                 print("Boustrophedon complete!")  
                 self.movement_state = MovementState.IDLE
                 data["state"] = BoustrophedonState.IDLE
-
-    
-        
-    def start_imu_process(self):
-        pass
-
-    def start_communication_module(self):
-        pass
-
-    def start_device_discovery(self):
-        pass
