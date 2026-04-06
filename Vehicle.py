@@ -114,7 +114,7 @@ class Vehicle:
                 self.movement_data["current_command_index"] = 0
 
     def boustrophedon_init(self):
-        self.movement_state = MovementState.Boustrophedon
+        self.movement_state = MovementState.BOUSTROPHEDON
         self.movement_data = {
             "state": BoustrophedonState.IDLE, 
             "current_lane": 0, 

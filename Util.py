@@ -24,6 +24,7 @@ class State(Enum):
 class MovementState(Enum):
     IDLE = 1
     HUB_SPOKE = 2
+    BOUSTROPHEDON = 3
     
 class PID_State(Enum):
     IDLE = 1
