@@ -57,7 +57,7 @@ class Vehicle:
 
     def start_test(self):
         self.movement_state = MovementState.HUB_SPOKE
-        self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0}
+        self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 0}
 
     def update(self):
         if self.pid.state == PID_State.IDLE:
@@ -99,7 +99,7 @@ class Vehicle:
                     self.movement_data["last_forward_time"] = self.pid.state_values.get("time_elapsed", 0)
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
-                    forward_time = self.pid.state_values.get("last_forward_time", 1)
+                    forward_time = self.movement_data.get("last_forward_time", 1)
                     command = ("straight", -30, forward_time)
                         
                 self.movement_data["current_command_index"] += 1

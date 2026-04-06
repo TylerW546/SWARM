@@ -213,13 +213,13 @@ class pidController:
         if (time.time() - start_time) >= seconds:
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "last_forward_time": time.time() - start_time}
+            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
             return
 
         if self.object_detected and speed > 0: # Only stop if we're moving forward and detect an object
             print("Object detected during straight movement! Stopping.")
             self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "last_forward_time": time.time() - start_time}
+            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
             return
         
         # 1. Calculate error
