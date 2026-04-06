@@ -63,7 +63,7 @@ class Vehicle:
         if self.pid.state == PID_State.IDLE:
             if self.movement_state == MovementState.HUB_SPOKE:
                 self.hub_spoke_movement()
-            if self.movement_state == MovementState.Boustrophedon:
+            if self.movement_state == MovementState.BOUSTROPHEDON:
                 self.boustrophedon_movement()
                 
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
