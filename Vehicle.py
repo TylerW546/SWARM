@@ -163,7 +163,7 @@ class Vehicle:
                 data["state"] = BoustrophedonState.LONG
 
         elif state == BoustrophedonState.TURNING_LEFT_SHORT:
-           if data["current_lane"] >= data["total_lanes"]:
+            if data["current_lane"] >= data["total_lanes"]:
                 data["state"] = BoustrophedonState.DONE
             else:
                 self.pid.rotate_left(degrees=90)
