@@ -86,11 +86,11 @@ class Vehicle:
         else:
             commands = [
                 ("straight", 30, 1), # forward
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
                 ("straight", -30, 1), # backward
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
                 ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
             ]
             if self.movement_data["current_command_index"] < len(commands):
                 command = commands[self.movement_data["current_command_index"]]
