@@ -100,15 +100,10 @@ class Vehicle:
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
                     forward_time = self.movement_data.get("last_forward_time", 1)
-                    command = ("straight", -50, forward_time)
+                    command = ("straight", -30, forward_time)
                         
                 self.movement_data["current_command_index"] += 1
-                if command[0] == "straight":
-                    self.movement_queue.append(command)
-                elif command[0] == "rotate_right":
-                    self.movement_queue.append(command)
-                elif command[0] == "wait":
-                    self.movement_queue.append(command)
+                self.movement_queue.append(command)
             else:
                 self.movement_data["current_iteration"] += 1
                 self.movement_data["current_command_index"] = 0
