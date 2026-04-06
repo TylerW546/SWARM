@@ -106,7 +106,7 @@ class pidController:
         # Encoder counts to reach
         counts = degrees/6
 
-        self.state = PID_State.TURNING_RIGHT
+        self.state = PID_State.TURNING_LEFT
         self.state_values = {"counts": counts}
 
         # Tell the L298N library to start rotating
