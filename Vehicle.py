@@ -63,7 +63,9 @@ class Vehicle:
         if self.pid.state == PID_State.IDLE:
             if self.movement_state == MovementState.HUB_SPOKE:
                 self.hub_spoke_movement()
-
+            if self.movement_state == MovementState.Boustrophedon:
+                self.boustrophedon_movement()
+                
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
@@ -110,6 +112,69 @@ class Vehicle:
             else:
                 self.movement_data["current_iteration"] += 1
                 self.movement_data["current_command_index"] = 0
+
+    def boustrophedon_init(self):
+        self.movement_state = MovementState.Boustrophedon
+        self.movement_data = {
+            "state": BoustrophedonState.IDLE, 
+            "current_lane": 0, 
+            "total_lanes": 10
+            }
+
+    def boustrophedon_movement(self):
+        if self.pid.state != PID_State.IDLE:
+            return
+        
+        data = self.movement_data
+        state = data["state"]
+
+        if state == BoustrophedonState.IDLE:
+            data["state"] = BoustrophedonState.LONG
+
+        elif state == BoustrophedonState.LONG:
+            self.pid.move_straight(speed=30, seconds=3)
+            if data["current_lane"] % 2 == 0: 
+                data["state"] = BoustrophedonState.TURNING_RIGHT_LONG
+            else:
+                data["state"] = BoustrophedonState.TURNING_LEFT_LONG
+
+        elif state == BoustrophedonState.TURNING_RIGHT_LONG:
+            self.pid.rotate_right(degrees=90)
+            data["state"] = BoustrophedonState.SHORT
+
+        elif state == BoustrophedonState.TURNING_LEFT_LONG:
+            self.pid.rotate_left(degrees=90)
+            data["state"] = BoustrophedonState.SHORT 
+
+        elif state == BoustrophedonState.SHORT:
+            self.pid.move_straight(speed=30, seconds=1)
+            if data["current_lane"] % 2 == 0: 
+                data["state"] = BoustrophedonState.TURNING_RIGHT_SHORT
+            else:
+                data["state"] = BoustrophedonState.TURNING_LEFT_SHORT
+
+            data["current_lane"] += 1
+
+        elif state == BoustrophedonState.TURNING_RIGHT_SHORT:
+            if data["current_lane"] >= data["total_lanes"]:
+                data["state"] = BoustrophedonState.DONE
+            else:
+                self.pid.rotate_right(degrees=90)
+                data["state"] = BoustrophedonState.LONG
+
+        elif state == BoustrophedonState.TURNING_LEFT_SHORT:
+           if data["current_lane"] >= data["total_lanes"]:
+                data["state"] = BoustrophedonState.DONE
+            else:
+                self.pid.rotate_left(degrees=90)
+                data["state"] = BoustrophedonState.LONG
+
+        elif state == BoustrophedonState.DONE:
+                print("Boustrophedon complete!")  
+                self.movement_state = MovementState.IDLE
+                data["state"] = BoustrophedonState.IDLE
+
+    
         
     def start_imu_process(self):
         pass

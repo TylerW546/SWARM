@@ -30,3 +30,13 @@ class PID_State(Enum):
     WAITING = 2
     STRAIGHT = 3
     TURNING_RIGHT = 4
+
+class BoustrophedonState(Enum):
+    LONG = 1
+    SHORT = 2
+    TURNING_RIGHT_LONG = 3
+    TURNING_LEFT_LONG = 4
+    TURNING_RIGHT_SHORT = 5
+    TURNING_LEFT_SHORT = 6
+    IDLE = 7
+    DONE = 8
