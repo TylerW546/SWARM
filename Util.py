@@ -16,6 +16,11 @@ PIXEL_COUNT_THRESHOLD = 500
 MOTOR_SPEED = 50
 TURN_SPEED = 50
 
+# Wheel encoder to distance values
+WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # Circumference in meters
+ENCODER_COUNT = 20 # Counts per rotation
+COUNT_TO_METERS = WHEEL_CIRC_METERS / ENCODER_COUNT
+
 # Right motor
 IN1 = 17
 IN2 = 27
