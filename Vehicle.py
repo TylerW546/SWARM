@@ -114,6 +114,7 @@ class Vehicle:
         self.pid.update()
 
     def follow_target_color(self):
+        print("following target color")
         # If we see the target, move towards it
         cx, cy, pixel_count = camera_process(self.camera)
         if pixel_count > PIXEL_COUNT_UPPER_THRESHOLD:
