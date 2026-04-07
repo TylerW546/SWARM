@@ -12,6 +12,10 @@ def get_ip():
     return ip
 
 PIXEL_COUNT_THRESHOLD = 500
+PIXEL_COUNT_UPPER_THRESHOLD = 500
+
+IMAGE_WIDTH = 320
+IMAGE_HEIGHT = 240
 
 MOTOR_SPEED = 50
 TURN_SPEED = 50
@@ -54,6 +58,7 @@ class MovementState(Enum):
     IDLE = 1
     HUB_SPOKE = 2
     BOUSTROPHEDON = 3
+    FOLLOW_TARGET_COLOR = 4
     
 class PID_State(Enum):
     IDLE = 1
