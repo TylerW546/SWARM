@@ -116,6 +116,7 @@ class Vehicle:
     def follow_target_color(self):
         # If we see the target, move towards it
         cx, cy, pixel_count = camera_process(self.camera)
+        print(f"Pixel count: {pixel_count}, Centroid: ({cx}, {cy})")
         if pixel_count > PIXEL_COUNT_UPPER_THRESHOLD:
             self.driver.stop_all()
             return
