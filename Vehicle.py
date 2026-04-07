@@ -1,7 +1,5 @@
 import uuid
 
-from Communications import *
-from Environment import *
 from Motors import *
 import UWBInterface
 from SerialInterface import SerialInterface
