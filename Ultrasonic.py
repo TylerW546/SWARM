@@ -26,7 +26,7 @@ class UltrasonicSensor:
         """
         This function runs automatically in a background thread 
         whenever the ECHO pin changes state.
-        'tick' is a high-precision microsecond timestamp from the kernel.
+        'tick' is a high-precision nanosecond timestamp from the kernel.
         """
         if level == 1:  # Rising edge (Echo starts)
             self.pulse_start = tick
@@ -34,7 +34,7 @@ class UltrasonicSensor:
             if self.pulse_start > 0:
                 duration = tick - self.pulse_start
                 print(f"end tick: {tick} (duration={duration / 1000000000})")
-                # Distance in cm = (microseconds * speed of sound) / 2 / 1,000,000
+                # Distance in cm = (nanoseconds * speed of sound) / 2 / 1,000,000
                 self.distance = (duration * 343) / 2 / 1000000000
                 self.pulse_start = 0
 

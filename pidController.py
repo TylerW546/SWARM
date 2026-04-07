@@ -8,7 +8,7 @@ from enum import Enum
 
 TURN_SPEED = 30
 
-
+DISTANCE_THRESHOLD = 0.3
 
 class pidController:
     def encoder_left_callback(self, chip, gpio, level, timestamp):
@@ -27,8 +27,9 @@ class pidController:
                 self.object_detected = False
                 print("Object gone!!")
 
-    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin):
+    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin, us):
         self.motor_driver = motor_driver
+        self.us = us
         self.encoder_count = {"left": 0, "right": 0}
         self.speeds = {"left": 0, "right": 0}
         self.object_detected = False
@@ -216,7 +217,7 @@ class pidController:
             self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
             return
 
-        if self.object_detected and speed > 0: # Only stop if we're moving forward and detect an object
+        if self.distance < DISTANCE_THRESHOLD and speed > 0: # Only stop if we're moving forward and detect an object
             print("Object detected during straight movement! Stopping.")
             self.state = PID_State.IDLE
             self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}

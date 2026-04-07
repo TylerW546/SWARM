@@ -11,6 +11,27 @@ def get_ip():
         s.close()
     return ip
 
+
+
+# Right motor
+IN1 = 17
+IN2 = 27
+ENA = 22 # PWM
+ENCODER_R = 16
+
+# Left motor
+IN3 = 23
+IN4 = 24
+ENB = 25 # PWM
+ENCODER_L = 19
+
+# IR sensor
+IR_PIN = 26
+
+# Ultrasonic sensor
+US_ECHO_PIN = 9
+US_TRIGGER_PIN = 11
+
 from enum import Enum 
 
 
@@ -42,3 +63,4 @@ class BoustrophedonState(Enum):
     TURNING_LEFT_SHORT = 6
     IDLE = 7
     DONE = 8
+    

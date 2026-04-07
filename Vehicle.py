@@ -8,25 +8,11 @@ from SerialInterface import SerialInterface
 from UWBInterface import *
 from Util import *
 from pidController import pidController
+from Ultrasonic import *
 import serial
 
 
 import uuid
-
-# Right motor
-IN1 = 17
-IN2 = 27
-ENA = 22 # PWM
-ENCODER_R = 16
-
-# Left motor
-IN3 = 23
-IN4 = 24
-ENB = 25 # PWM
-ENCODER_L = 19
-
-# IR sensor
-IR_PIN = 26
 
 class Vehicle:
     def __init__(self):
@@ -43,6 +29,8 @@ class Vehicle:
         # Initialize gpio
         self.chip = lgpio.gpiochip_open(0)
 
+        self.us = UltrasonicSensor(self.chip, trigger_pin=US_TRIGGER_PIN, echo_pin=US_ECHO_PIN)
+
         self.movement_queue = []
         self.movement_state = MovementState.IDLE
         self.movement_data = {}
@@ -53,7 +41,7 @@ class Vehicle:
             in1=IN1, in2=IN2, ena=ENA,
             in3=IN3, in4=IN4, enb=ENB,
         )
-        self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, IR_PIN)
+        self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, IR_PIN, self.us)
 
     def start_test(self):
         self.movement_state = MovementState.HUB_SPOKE
