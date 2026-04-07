@@ -120,9 +120,11 @@ class Vehicle:
         print(f"Pixel count: {pixel_count}, Centroid: ({cx}, {cy})")
         if pixel_count > PIXEL_COUNT_UPPER_THRESHOLD:
             self.driver.stop_all()
+            print(" Target acquired! Stopping motors.")
             return
         
         if pixel_count > PIXEL_COUNT_THRESHOLD and cx is not None and cy is not None:
+            print("Target detected, adjusting movement.")
             # Simple proportional controller to center the target
             # positive if the target is to the right
             error_x = cx - IMAGE_WIDTH // 2
@@ -146,6 +148,7 @@ class Vehicle:
             self.driver.motor_right_rotate(right_speed)
 
         else:
+            print("No target detected, searching...")
             # If we don't see the target, stop or search
             self.driver.motor_left_rotate(TURN_SPEED)
             self.driver.motor_right_rotate(-TURN_SPEED)
