@@ -10,7 +10,6 @@ class SerialInterface:
         self.baudrate = baudrate
         self.ser = self.open_serial()
 
-
         self.lines_read = []
         self.to_send_queue = []
 

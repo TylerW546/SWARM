@@ -11,6 +11,7 @@ def get_ip():
         s.close()
     return ip
 
+PIXEL_COUNT_THRESHOLD = 500
 
 MOTOR_SPEED = 50
 TURN_SPEED = 50
