@@ -128,10 +128,12 @@ class Vehicle:
             # Simple proportional controller to center the target
             # positive if the target is to the right
             error_x = -(cx - IMAGE_WIDTH // 2)
+
+            pix_frac = min((pixel_count - PIXEL_COUNT_THRESHOLD) // (PIXEL_COUNT_UPPER_THRESHOLD - PIXEL_COUNT_THRESHOLD), 1)
             if abs(error_x) < 20:
                 print("Target centered, moving forward.")
-                self.driver.motor_left_rotate(MOTOR_SPEED)
-                self.driver.motor_right_rotate(MOTOR_SPEED)
+                self.driver.motor_left_rotate(MOTOR_SPEED * (1-pix_frac))
+                self.driver.motor_right_rotate(MOTOR_SPEED * (1-pix_frac))
                 return
 
             # fraction of how many pixels we have between the threshold and upper threshold

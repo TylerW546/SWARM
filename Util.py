@@ -11,7 +11,7 @@ def get_ip():
         s.close()
     return ip
 
-PIXEL_COUNT_THRESHOLD = 500
+PIXEL_COUNT_THRESHOLD = 300
 PIXEL_COUNT_UPPER_THRESHOLD = 3000
 
 IMAGE_WIDTH = 320
