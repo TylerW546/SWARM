@@ -26,7 +26,6 @@ def camera_process():
 
     h, w, _ = frame.shape
     pixel_count = cv2.countNonZero(mask)
-    print("Pixel count:", pixel_count)
 
     # Find centroid
     cx, cy = None, None
@@ -34,7 +33,6 @@ def camera_process():
     if moments["m00"] > 0:
         cx = int(moments["m10"] / moments["m00"])
         cy = int(moments["m01"] / moments["m00"])
-        print("Found at:", cx, cy)
 
     return cx, cy, pixel_count
 
