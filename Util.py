@@ -12,6 +12,9 @@ def get_ip():
     return ip
 
 
+MOTOR_SPEED = 50
+TURN_SPEED = 30
+
 
 # Right motor
 IN1 = 17

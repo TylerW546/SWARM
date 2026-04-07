@@ -6,7 +6,6 @@ import time
 from Util import *
 from enum import Enum 
 
-TURN_SPEED = 30
 
 DISTANCE_THRESHOLD = 0.3
 

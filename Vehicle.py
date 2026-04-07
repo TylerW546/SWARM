@@ -73,9 +73,9 @@ class Vehicle:
             print("Test complete!")
         else:
             commands = [
-                ("straight", 30, 1), # forward
+                ("straight", MOTOR_SPEED, 1), # forward
                 ("wait", 0, 0.5),
-                ("straight", -30, 1), # backward
+                ("straight", -MOTOR_SPEED, 1), # backward
                 ("wait", 0, 0.5),
                 ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
                 ("wait", 0, 0.5),
@@ -88,7 +88,7 @@ class Vehicle:
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
                     forward_time = self.movement_data.get("last_forward_time", 1)
-                    command = ("straight", -30, forward_time)
+                    command = ("straight", -MOTOR_SPEED, forward_time)
                         
                 self.movement_data["current_command_index"] += 1
                 self.movement_queue.append(command)
@@ -115,7 +115,7 @@ class Vehicle:
             data["state"] = BoustrophedonState.LONG
 
         elif state == BoustrophedonState.LONG:
-            self.pid.move_straight(speed=30, seconds=3)
+            self.pid.move_straight(speed=MOTOR_SPEED, seconds=3)
             if data["current_lane"] % 2 == 0: 
                 data["state"] = BoustrophedonState.TURNING_RIGHT_LONG
             else:
@@ -130,7 +130,7 @@ class Vehicle:
             data["state"] = BoustrophedonState.SHORT 
 
         elif state == BoustrophedonState.SHORT:
-            self.pid.move_straight(speed=30, seconds=1)
+            self.pid.move_straight(speed=MOTOR_SPEED, seconds=1)
             if data["current_lane"] % 2 == 0: 
                 data["state"] = BoustrophedonState.TURNING_RIGHT_SHORT
             else:
