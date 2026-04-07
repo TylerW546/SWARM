@@ -98,7 +98,7 @@ class Vehicle:
             elif self.movement_state == MovementState.FOLLOW_TARGET_COLOR:
                 self.follow_target_color()
 
-        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0:
+        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
                 self.pid.move_straight(speed=command[1], seconds=command[2])
@@ -114,7 +114,6 @@ class Vehicle:
         self.pid.update()
 
     def follow_target_color(self):
-        print("following target color")
         # If we see the target, move towards it
         cx, cy, pixel_count = camera_process(self.camera)
         if pixel_count > PIXEL_COUNT_UPPER_THRESHOLD:
