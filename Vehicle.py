@@ -37,6 +37,11 @@ def camera_process(camera):
         cx = int(moments["m10"] / moments["m00"])
         cy = int(moments["m01"] / moments["m00"])
 
+    cv2.circle(frame, center=(cx, cy), radius=100, color=(255, 0, 0), thickness=2)
+
+    cv2.imshow("frame", frame)
+    cv2.imshow("mask", mask)
+
     return cx, cy, pixel_count
 
     #     # draw for debugging
