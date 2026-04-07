@@ -57,7 +57,7 @@ last_frame_time = time.time()
 
 while True:
     frame_start = time.time()
-    print("Frame time: ", frame_start - last_frame_time)
+    # print("Frame time: ", frame_start - last_frame_time)
     last_frame_time = frame_start
     
     if v.state == State.INIT_DEVICE_DISCOVERY:
