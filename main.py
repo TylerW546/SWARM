@@ -105,9 +105,9 @@ while True:
 
     # run communication processes
 
-    cx, cy, pixel_count = camera_process()
-    if pixel_count > PIXEL_COUNT_THRESHOLD: 
-        print(f"Object detected at ({cx}, {cy}) with pixel count {pixel_count}")
+    # cx, cy, pixel_count = camera_process()
+    # if pixel_count > PIXEL_COUNT_THRESHOLD: 
+    #     print(f"Object detected at ({cx}, {cy}) with pixel count {pixel_count}")
 
     v.update()
 
