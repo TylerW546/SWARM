@@ -12,7 +12,7 @@ def get_ip():
     return ip
 
 
-MOTOR_SPEED = 50
+MOTOR_SPEED = 60
 TURN_SPEED = 30
 
 

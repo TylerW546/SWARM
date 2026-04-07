@@ -216,7 +216,7 @@ class pidController:
             self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
             return
 
-        if self.distance < DISTANCE_THRESHOLD and speed > 0: # Only stop if we're moving forward and detect an object
+        if self.distance < DISTANCE_THRESHOLD and self.distance != 0 and speed > 0: # Only stop if we're moving forward and detect an object
             print("Object detected during straight movement! Stopping.")
             self.state = PID_State.IDLE
             self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
