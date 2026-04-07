@@ -30,7 +30,7 @@ def run_test():
     chip = lgpio.gpiochip_open(0)
 
     # Initialize ultrasonic sensor
-    us = UltrasonicSensor(chip, trigger_pin=US_TRIGGER_PIN, echo_pin=US_ECHO_PIN)
+    sonar = UltrasonicSensor(chip, trigger_pin=US_TRIGGER_PIN, echo_pin=US_ECHO_PIN)
 
     # Initialize motor driver
     driver = L298NMotorDriver(
@@ -39,13 +39,12 @@ def run_test():
         in3=IN3, in4=IN4, enb=ENB,
     )
 
-    for _ in range(1000):
-        us.trigger()
-        print(f"distance={us.distance:.3f}m")
-        time.sleep(0.5)
+    # for _ in range(1000):
+    #     sonar.trigger()
+    #     print(f"distance={sonar.distance:.3f}m")
+        # time.sleep(0.5)
 
-    '''
-    pid = pidController(chip, driver, ENCODER_L, ENCODER_R, IR_PIN)
+    pid = pidController(chip, driver, ENCODER_L, ENCODER_R, IR_PIN, sonar)
     pid.move_straight(35, 1)
 
     while (1):
@@ -76,7 +75,7 @@ def run_test():
     #     time.sleep(0.5)
     #     pid.rotate_right(90) # degrees
     #     time.sleep(0.5)    
-    '''
+    # '''
 
     driver.stop_all()
     driver.cleanup()

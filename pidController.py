@@ -7,8 +7,6 @@ from Util import *
 from enum import Enum 
 
 
-DISTANCE_THRESHOLD = 0.3
-
 class pidController:
     def encoder_left_callback(self, chip, gpio, level, timestamp):
         self.encoder_count["left"] += 1
@@ -26,9 +24,9 @@ class pidController:
                 self.object_detected = False
                 print("Object gone!!")
 
-    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin, us):
+    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin, sonar):
         self.motor_driver = motor_driver
-        self.us = us
+        self.sonar = sonar
         self.encoder_count = {"left": 0, "right": 0}
         self.speeds = {"left": 0, "right": 0}
         self.object_detected = False
@@ -54,22 +52,20 @@ class pidController:
 
         lgpio.gpio_claim_alert(chip, ir_pin, lgpio.BOTH_EDGES)
         self.cb_ir = lgpio.callback(chip, ir_pin, lgpio.BOTH_EDGES, self.ir_callback)
-        
 
-    # TODO: take distance as an argument instead of time and use encoder counts
-    # to move the correct amount
-    def move_straight(self, speed, seconds=5):
+
+    def move_straight(self, speed, distance):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
         # Reset encoder counts and PID state for a clean run
-        
+
         self.encoder_count = {"left": 0, "right": 0}
         self.integral = 0
         self.prev_error = 0
-        
+
         self.state = PID_State.STRAIGHT
-        self.state_values = {"target_speed": speed, "start_time": time.time(), "duration": seconds}
+        self.state_values = {"target_speed": speed, "distance": distance}
 
         # Tell the L298N library to start moving forward
         self.motor_driver.motor_left_rotate(speed)
@@ -116,7 +112,7 @@ class pidController:
     def update(self):
         if self.state == PID_State.IDLE or self.state == PID_State.WAITING:
             self.motor_driver.stop_all()
-        
+
         if self.state == PID_State.STRAIGHT:
             self.straight_update()
         elif self.state == PID_State.TURNING_RIGHT:
@@ -134,7 +130,7 @@ class pidController:
     def wait_update(self):
         if self.state != PID_State.WAITING:
             return
-        
+
         start = self.state_values["wait_start"]
         duration = self.state_values["wait_duration"]
 
@@ -147,7 +143,7 @@ class pidController:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             return
-    
+
         # 1. Calculate the Error
         # If positive: Left is spinning faster. If negative: Right is spinning faster.
         error = self.encoder_count["left"] - self.encoder_count["right"]
@@ -167,7 +163,7 @@ class pidController:
         left_speed = TURN_SPEED - adjustment
         right_speed = -(TURN_SPEED + adjustment)
 
-        print(f"({left_speed}, {right_speed})") 
+        # print(f"({left_speed}, {right_speed})")
 
         # 5. Apply the new speeds to the motors
         self.motor_driver.motor_left_rotate(left_speed)
@@ -199,7 +195,7 @@ class pidController:
         left_speed = -(TURN_SPEED - adjustment)
         right_speed = (TURN_SPEED + adjustment)
 
-        print(f"({left_speed}, {right_speed})") 
+        # print(f"({left_speed}, {right_speed})") 
 
         # 5. Apply the new speeds to the motors
         self.motor_driver.motor_left_rotate(left_speed)
@@ -210,21 +206,36 @@ class pidController:
             return
 
         speed = self.state_values["target_speed"]
-        seconds = self.state_values["duration"]
-        start_time = self.state_values["start_time"]
+        distance = self.state_values["distance"]
 
-        if (time.time() - start_time) >= seconds:
+        counts = (self.encoder_count["left"] + self.encoder_count["right"]) // 2
+        distance_traveled = counts * COUNT_TO_METERS
+
+        if distance_traveled >= distance:
             print("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": True, "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
-            return
-
-        if self.us.distance < DISTANCE_THRESHOLD and self.us.distance != 0 and speed > 0: # Only stop if we're moving forward and detect an object
-            print("Object detected during straight movement! Stopping.")
-            self.state = PID_State.IDLE
-            self.state_values = {"last_state_success": False, "reason": "object_detected", "final_encoder_count": self.encoder_count, "time_elapsed": time.time() - start_time}
+            self.motor_driver.stop_all()
+            self.state_values = {
+                "last_state_success": True,
+                "final_encoder_count": self.encoder_count,
+                "final_distance_traveled": distance_traveled
+            }
             return
         
+        # Only stop if we're moving forward and detect an object
+        if self.sonar.distance > 0 and self.sonar.distance < DISTANCE_THRESHOLD and speed > 0:
+            print("Object detected during straight movement! Stopping.")
+            self.state = PID_State.IDLE
+            counts = (self.encoder_count["left"] + self.encoder_count["right"]) // 2
+            final_distance = counts * COUNT_TO_METERS
+            self.state_values = {
+                "last_state_success": False,
+                "reason": "object_detected",
+                "final_encoder_count": self.encoder_count,
+                "final_distance": final_distance,
+            }
+            return
+
         # 1. Calculate error
         # If positive: Left is spinning faster. If negative: Right is spinning faster.
         error = self.encoder_count["left"] - self.encoder_count["right"]
@@ -248,7 +259,7 @@ class pidController:
         left_speed = speed - adjustment
         right_speed = speed + adjustment
 
-        print(f"({left_speed}, {right_speed})") 
+        # print(f"({left_speed}, {right_speed})") 
 
         # 5. Apply the new speeds to the motors
         self.motor_driver.motor_left_rotate(left_speed)
