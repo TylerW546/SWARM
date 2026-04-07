@@ -12,9 +12,8 @@ def get_ip():
     return ip
 
 
-MOTOR_SPEED = 60
-TURN_SPEED = 30
-
+MOTOR_SPEED = 50
+TURN_SPEED = 50
 
 # Right motor
 IN1 = 17
@@ -56,6 +55,7 @@ class PID_State(Enum):
     STRAIGHT = 3
     TURNING_RIGHT = 4
     TURNING_LEFT = 5
+    COAST = 6
 
 class BoustrophedonState(Enum):
     LONG = 1
