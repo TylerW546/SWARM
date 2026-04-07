@@ -18,7 +18,7 @@ IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 
 MOTOR_SPEED = 50
-TURN_SPEED = 50
+TURN_SPEED = 30
 
 # Wheel encoder to distance values
 WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # Circumference in meters

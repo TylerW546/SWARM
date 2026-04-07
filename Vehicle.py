@@ -127,17 +127,21 @@ class Vehicle:
             print("Target detected, adjusting movement.")
             # Simple proportional controller to center the target
             # positive if the target is to the right
-            error_x = cx - IMAGE_WIDTH // 2
+            error_x = -(cx - IMAGE_WIDTH // 2)
+            if abs(error_x) < 20:
+                print("Target centered, moving forward.")
+                self.driver.motor_left_rotate(MOTOR_SPEED)
+                self.driver.motor_right_rotate(MOTOR_SPEED)
+                return
 
             # fraction of how many pixels we have between the threshold and upper threshold
             # pix_fraction = (min(pixel_count) - PIXEL_COUNT_THRESHOLD) // (PIXEL_COUNT_UPPER_THRESHOLD - PIXEL_COUNT_THRESHOLD)
 
             # Convert pixel error to motor speed adjustments
-            k_px = 0.1
+            k_px = 0.05
 
-            speed_x = int(k_px * error_x)
+            speed_x = TURN_SPEED + int(k_px * error_x)
             # Cap speeds to max values
-            speed_x = max(min(speed_x, TURN_SPEED), -TURN_SPEED)
 
             # Set motor speeds (simple differential drive logic)
             left_speed = speed_x
