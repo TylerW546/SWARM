@@ -12,7 +12,7 @@ def get_ip():
     return ip
 
 PIXEL_COUNT_THRESHOLD = 500
-PIXEL_COUNT_UPPER_THRESHOLD = 2000
+PIXEL_COUNT_UPPER_THRESHOLD = 3000
 
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
@@ -68,6 +68,7 @@ class PID_State(Enum):
     TURNING_RIGHT = 4
     TURNING_LEFT = 5
     COAST = 6
+    OVERRIDE = 7
 
 class BoustrophedonState(Enum):
     LONG = 1
