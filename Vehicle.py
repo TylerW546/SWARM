@@ -23,8 +23,8 @@ def camera_process(camera):
 
     # For tracking something bright orange
     HUE = 26
-    lower = np.array([HUE - 5, 100, 100])
-    upper = np.array([HUE + 5, 255, 255])
+    lower = np.array([HUE - 10, 100, 100])
+    upper = np.array([HUE + 10, 255, 255])
 
     mask = cv2.inRange(hsv, lower, upper)
 
