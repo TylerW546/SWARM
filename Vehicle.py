@@ -41,6 +41,7 @@ def camera_process(camera):
 
     cv2.imshow("frame", frame)
     cv2.imshow("mask", mask)
+    cv2.waitKey(0)
 
     return cx, cy, pixel_count
 
