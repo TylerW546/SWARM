@@ -22,7 +22,7 @@ def camera_process(camera):
     hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
 
     # For tracking something bright orange
-    HUE = 26
+    HUE = 110
     lower = np.array([HUE - 10, 100, 100])
     upper = np.array([HUE + 10, 255, 255])
 
