@@ -135,7 +135,7 @@ class Vehicle:
             error_x = -(cx - IMAGE_WIDTH // 2)
 
             pix_frac = min((pixel_count - PIXEL_COUNT_THRESHOLD) // (PIXEL_COUNT_UPPER_THRESHOLD - PIXEL_COUNT_THRESHOLD), 1)
-            if abs(error_x) < 20:
+            if abs(error_x) < 50:
                 print("Target centered, moving forward.")
                 self.driver.motor_left_rotate(MOTOR_SPEED * (1-pix_frac))
                 self.driver.motor_right_rotate(MOTOR_SPEED * (1-pix_frac))
