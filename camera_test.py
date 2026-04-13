@@ -33,7 +33,7 @@ while True:
     mask = cv2.inRange(lab, lower, upper)
     pixel_count = cv2.countNonZero(mask)
 
-    circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=100)
+    circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
     if circles is not None:
         circles = np.uint16(np.around(circles))
         for i in circles[0, :]:
