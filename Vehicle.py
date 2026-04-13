@@ -119,7 +119,7 @@ class Vehicle:
             self.movement_state = MovementState.FOLLOW_TARGET_COLOR
             self.pid.state = PID_State.OVERRIDE
             self.movement_data = {}
-        else if state == MovementState.HUB_SPOKE:
+        elif state == MovementState.HUB_SPOKE:
             self.movement_state = MovementState.HUB_SPOKE
             self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
 
