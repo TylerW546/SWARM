@@ -13,6 +13,32 @@ import numpy as np
 from picamera2 import Picamera2
 import cv2
 
+# chatgpt
+def is_roughly_circular(mask, circularity_threshold=0.8):
+    """
+    Check if a binary mask is roughly circular.
+    
+    :param mask: Binary mask (numpy array, dtype=uint8, values 0 or 255)
+    :param circularity_threshold: Minimum circularity to consider as circular
+    :return: (bool, circularity_value)
+    """
+    # Find contours
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return False, 0.0
+
+    # Take the largest contour
+    contour = max(contours, key=cv2.contourArea)
+    area = cv2.contourArea(contour)
+    perimeter = cv2.arcLength(contour, True)
+
+    if perimeter == 0:
+        return False, 0.0
+
+    # Calculate circularity
+    circularity = 4 * np.pi * (area / (perimeter ** 2))
+
+    return circularity >= circularity_threshold, circularity
 
 def camera_process(camera):
     frame = camera.capture_array()
@@ -23,8 +49,8 @@ def camera_process(camera):
 
     # For tracking something bright orange
     HUE = 110
-    lower = np.array([HUE - 10, 100, 100])
-    upper = np.array([HUE + 10, 255, 255])
+    lower = np.array([HUE - 5, 100, 100])
+    upper = np.array([HUE + 5, 255, 255])
 
     mask = cv2.inRange(hsv, lower, upper)
 
@@ -45,13 +71,10 @@ def camera_process(camera):
         cv2.imshow("mask", mask)
         cv2.waitKey(1)
 
-    return cx, cy, pixel_count
-
-    #     # draw for debugging
-    #     cv2.circle(frame, center=(cx, cy), radius=100, color=(255, 0, 0), thickness=2)
-
-    # cv2.imshow("frame", frame)
-    # cv2.imshow("mask", mask)
+    # circle check:
+    if is_roughly_circular(mask)[0]:
+        return cx, cy, pixel_count
+    return None, None, 0
 
 
 
@@ -91,12 +114,14 @@ class Vehicle:
         )
         self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, IR_PIN, self.us)
 
-    def start_test(self):
-        self.movement_state = MovementState.FOLLOW_TARGET_COLOR
-        self.pid.state = PID_State.OVERRIDE
-        self.movement_data = {}
-        # self.movement_state = MovementState.HUB_SPOKE
-        # self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
+    def start_test(self, state):
+        if state == MovementState.FOLLOW_TARGET_COLOR:
+            self.movement_state = MovementState.FOLLOW_TARGET_COLOR
+            self.pid.state = PID_State.OVERRIDE
+            self.movement_data = {}
+        else if state == MovementState.HUB_SPOKE:
+            self.movement_state = MovementState.HUB_SPOKE
+            self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
 
     def update(self):
         if self.pid.state == PID_State.IDLE or self.pid.state == PID_State.OVERRIDE:

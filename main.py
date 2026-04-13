@@ -31,7 +31,7 @@ while True:
 
     if v.state == State.INIT_PARENTING:
         print("I am leader")
-        v.start_test()
+        v.start_test(MovementState.FOLLOW_TARGET_COLOR)
         # uwb.enter_ranging_mode()
         time.sleep(1)
         v.state = State.WANDER
