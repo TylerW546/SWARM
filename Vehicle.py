@@ -44,21 +44,22 @@ def camera_process(camera):
     frame = camera.capture_array()
 
     # Convert to HSV
+    lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-    hsv = cv2.cvtColor(frame, cv2.COLOR_RGB2HSV)
+
+    cv2.circle(frame, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
+    print(frame[IMAGE_WIDTH//2][IMAGE_HEIGHT//2])
 
     # For tracking something bright orange
-    HUE = 110
-    lower = np.array([HUE - 5, 100, 100])
-    upper = np.array([HUE + 5, 255, 255])
+    lower = np.array([0, 164, 147])
+    upper = np.array([255, 200, 200])
 
-    mask = cv2.inRange(hsv, lower, upper)
-
-    h, w, _ = frame.shape
+    mask = cv2.inRange(lab, lower, upper)
     pixel_count = cv2.countNonZero(mask)
 
+    cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
+
     # Find centroid
-    cx, cy = None, None
     moments = cv2.moments(mask)
     if moments["m00"] > 0:
         cx = int(moments["m10"] / moments["m00"])
