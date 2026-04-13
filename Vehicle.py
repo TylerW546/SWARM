@@ -40,7 +40,7 @@ def camera_process(camera):
                 cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
                 # draw the center of the circle
                 cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
-            return i[0], i[1], pixel_count
+            return i[0], i[1], i[2], pixel_count
             break
         
     # # Find centroid
@@ -56,7 +56,7 @@ def camera_process(camera):
     #     cv2.imshow("mask", mask)
     #     cv2.waitKey(1)
 
-    return None, None, 0
+    return None, None, 0, 0
 
 
 
@@ -131,14 +131,14 @@ class Vehicle:
 
     def follow_target_color(self):
         # If we see the target, move towards it
-        cx, cy, pixel_count = camera_process(self.camera)
-        print(f"Pixel count: {pixel_count}, Centroid: ({cx}, {cy})")
-        if pixel_count > PIXEL_COUNT_UPPER_THRESHOLD:
+        cx, cy, cr, pixel_count = camera_process(self.camera)
+        print(f"Pixel count: {pixel_count}, Centroid: ({cx}, {cy}), Radius: {cr}")
+        if cr > 100:
             self.driver.stop_all()
             print(" Target acquired! Stopping motors.")
             return
         
-        if pixel_count > PIXEL_COUNT_THRESHOLD and cx is not None and cy is not None:
+        if cr < 100 and cx is not None and cy is not None:
             print("Target detected, adjusting movement.")
             # Simple proportional controller to center the target
             # positive if the target is to the right
