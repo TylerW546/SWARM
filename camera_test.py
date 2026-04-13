@@ -35,8 +35,12 @@ while True:
 
     circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
     if circles is not None:
-        circle = circles[0][0]
-        cx, cy, radius = int(circle[0]), int(circle[1]), int(circles[0][0][2])
+        circles = np.uint16(np.around(circles))
+        for i in circles[0, 0]:
+            # draw the outer circle
+            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            # draw the center of the circle
+            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
     # cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
 
     # Find centroid
