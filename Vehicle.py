@@ -94,7 +94,7 @@ class Vehicle:
             in1=IN1, in2=IN2, ena=ENA,
             in3=IN3, in4=IN4, enb=ENB,
         )
-        self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, IR_PIN, self.us)
+        self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, self.us)
 
     def start_test(self, state):
         if state == MovementState.FOLLOW_TARGET_COLOR:

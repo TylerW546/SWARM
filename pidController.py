@@ -16,15 +16,7 @@ class pidController:
         self.encoder_count["right"] += 1
         # print("[right]: Encoder count =", self.encoder_count["right"])
 
-    def ir_callback(self, chip, gpio, level, timestamp):
-            if level == 0: # Falling edge (1 -> 0)
-                self.object_detected = True
-                print("Object detected!!")
-            else:
-                self.object_detected = False
-                print("Object gone!!")
-
-    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, ir_pin, sonar):
+    def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, sonar):
         self.motor_driver = motor_driver
         self.sonar = sonar
         self.encoder_count = {"left": 0, "right": 0}
@@ -50,8 +42,6 @@ class pidController:
         lgpio.gpio_claim_alert(chip, encoder_r_pin, lgpio.RISING_EDGE)
         self.cb_right = lgpio.callback(chip, encoder_r_pin, lgpio.RISING_EDGE, self.encoder_right_callback)
 
-        lgpio.gpio_claim_alert(chip, ir_pin, lgpio.BOTH_EDGES)
-        self.cb_ir = lgpio.callback(chip, ir_pin, lgpio.BOTH_EDGES, self.ir_callback)
 
 
     def move_straight(self, speed, distance):
