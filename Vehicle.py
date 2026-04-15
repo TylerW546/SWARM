@@ -14,6 +14,9 @@ from picamera2 import Picamera2
 import cv2
 
 def camera_process(camera):
+    if camera is None:
+        return None, None, 0, 0
+    
     frame = camera.capture_array()
 
     # Convert to HSV
@@ -70,9 +73,14 @@ class Vehicle:
         self.uwb = UWBInterface(self.ser)
         self.uwb.assign_id(str(uuid.getnode()))
 
-        self.camera = Picamera2()
-        self.camera.configure(self.camera.create_preview_configuration(main={"size": (IMAGE_WIDTH, IMAGE_HEIGHT)}))
-        self.camera.start()
+        try:
+            self.camera = Picamera2()
+            self.camera.configure(self.camera.create_preview_configuration(main={"size": (IMAGE_WIDTH, IMAGE_HEIGHT)}))
+            self.camera.start()
+        except Exception as e:
+            print("Camera initialization failed:", e)
+            self.camera = None
+            
         time.sleep(0.2)
         
         self.uwb.ser.add_to_send_queue(f"*MY_IP={get_ip()}~")
