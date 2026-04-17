@@ -115,6 +115,8 @@ class pidController:
         elif self.state == PID_State.COAST:
             self.motor_driver.coast()
 
+        self.sonar.trigger()
+
     def wait(self, seconds):
         self.state = PID_State.WAITING
         self.state_values = {"wait_start": time.time(), "wait_duration": seconds}
