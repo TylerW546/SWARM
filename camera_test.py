@@ -24,11 +24,10 @@ while True:
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    lower = np.array([60, 100, 160])
+    lower = np.array([60, 100, 120])
     upper = np.array([255, 180, 230])
 
     print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
-    cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
     
 
     mask = cv2.inRange(lab, lower, upper)
@@ -47,6 +46,9 @@ while True:
             # draw the center of the circle
             cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
             break
+
+    cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
+    
 
     cv2.imshow("lab", lab)
     cv2.imshow("frame", frame)
