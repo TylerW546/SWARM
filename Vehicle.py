@@ -220,7 +220,7 @@ class Vehicle:
                 command = commands[self.movement_data["current_command_index"]]
 
                 if self.movement_data["current_command_index"] == 1:
-                    self.movement_data["last_forward_distance"] = self.pid.state_values.get("final_distance", 0)
+                    self.movement_data["last_forward_distance"] = self.pid.state_values.get("final_distance_traveled", 1)
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
                     forward_distance = self.movement_data.get("last_forward_distance", 1)

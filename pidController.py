@@ -224,7 +224,7 @@ class pidController:
                 "last_state_success": False,
                 "reason": "object_detected",
                 "final_encoder_count": self.encoder_count,
-                "final_distance": final_distance,
+                "final_distance_traveled": final_distance,
             }
             return
 
