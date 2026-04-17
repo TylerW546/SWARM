@@ -38,6 +38,9 @@ class UltrasonicSensor:
                 self.distance = (duration * 343) / 2 / 1000000000
                 self.pulse_start = 0
 
+    def close(self):
+        self.cb.cancel()
+
     def trigger(self):
         """Sends the 10us pulse."""
         lgpio.gpio_write(self.h, self.trigger_pin, 1)
