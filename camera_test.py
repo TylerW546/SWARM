@@ -32,7 +32,7 @@ while True:
 
     mask = cv2.inRange(lab, lower, upper)
 
-    small_kernel = np.ones((3,3), np.uint8)
+    small_kernel = np.ones((5,5), np.uint8)
     kernel = np.ones((7,7), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, small_kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
