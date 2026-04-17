@@ -37,6 +37,7 @@ while True:
         v.state = State.WANDER
         
     if v.state == State.INIT_CHILD:
+        v.start_test(MovementState.FOLLOW_TARGET_COLOR)
         time.sleep(1)
         
 
