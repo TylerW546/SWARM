@@ -16,35 +16,51 @@ import cv2
 def camera_process(camera):
     if camera is None:
         return None, None, 0, 0
-    
+
     frame = camera.capture_array()
 
-    # Convert to HSV
+    frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    # cv2.circle(frame, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
-    print(frame[IMAGE_WIDTH//2][IMAGE_HEIGHT//2])
+    # orange
+    lower = np.array([60, 110, 130])
+    upper = np.array([255, 180, 230])
+    orange = cv2.inRange(lab, lower, upper)
 
-    # For tracking something bright orange
-    lower = np.array([0, 164, 147])
-    upper = np.array([255, 200, 200])
+    # # blue
+    # lower = np.array([100, 100, 100])
+    # upper = np.array([255, 180, 230])
+    # blue = cv2.inRange(cv2.cvtColor(frame, cv2.COLOR_RGB2HSV), lower, upper)
+    
 
-    mask = cv2.inRange(lab, lower, upper)
-    pixel_count = cv2.countNonZero(mask)
+    small_kernel = np.ones((5,5), np.uint8)
+    kernel = np.ones((7,7), np.uint8)
+    orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
+    orange = cv2.morphologyEx(orange, cv2.MORPH_DILATE, kernel)
+    
+    # blue = cv2.morphologyEx(blue, cv2.MORPH_OPEN, small_kernel)
+    # blue = cv2.morphologyEx(blue, cv2.MORPH_DILATE, kernel)
+    
 
-    circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
-    if circles is not None:
-        circles = np.uint16(np.around(circles))
-        for i in circles[0, :]:
-            
-            if VISUALIZE:
+    orange_circles = cv2.HoughCircles(orange, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
+    # blue_circles = cv2.HoughCircles(blue, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
+    if orange_circles is not None:
+        orange_circles = np.uint16(np.around(orange_circles))
+        for i in orange_circles[0, :]:
+            if VISUALIZE: 
                 # draw the outer circle
                 cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
                 # draw the center of the circle
                 cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
-            return i[0], i[1], i[2], pixel_count
-            break
+            return i[0], i[1], i[2], cv2.countNonZero(orange)
+
+    # cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
+    
+
+    # cv2.imshow("lab", lab)
+    # cv2.imshow("frame", frame)
+    # cv2.imshow("orange", orange)
+
         
     # # Find centroid
     # moments = cv2.moments(mask)
