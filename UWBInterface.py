@@ -24,6 +24,8 @@ class UWBInterface:
         
         self.uwb_messages_recieved = []
 
+        self.requesting_reset = False
+
 
     def assign_id(self, id):
         self.ser.add_to_send_queue(f"*ASSIGN_ID:{id}~")
