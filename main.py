@@ -111,6 +111,14 @@ while True:
 
     v.update()
 
+    if v.uwb.requesting_reset:
+        # close all resources and restart the program
+        v.close_all()
+        try:
+            os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
+        except Exception as e:
+            print(f"Failed to reset: {e}")
+
     while time.time() - frame_start < 0.05:
         pass
 

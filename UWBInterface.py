@@ -55,12 +55,6 @@ class UWBInterface:
     def check_ranging_state(self, message):
         self.ser.add_to_send_queue(f"*RANGE_QUERY:{message.message_id}~")
 
-    def reset(self):
-        try:
-            os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
-        except Exception as e:
-            print(f"Failed to reset: {e}")
-
     def update(self):
         for line in self.ser.lines_read:
             print(f"Processing line: {line}")
@@ -73,7 +67,7 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
-                self.reset()
+                self.requesting_reset = True
             elif line.startswith("*REC:"):
                 # Process range response
                 self.uwb_messages_recieved.append(line[5:-1])

@@ -104,6 +104,12 @@ class Vehicle:
         )
         self.pid = pidController(self.chip, self.driver, ENCODER_L, ENCODER_R, self.us)
 
+    def close_all(self):
+        self.camera.stop()
+        self.pid.close()
+        self.driver.close()
+        lgpio.gpiochip_close(self.chip)
+
     def start_test(self, state):
         if state == MovementState.FOLLOW_TARGET_COLOR:
             self.movement_state = MovementState.FOLLOW_TARGET_COLOR
