@@ -21,8 +21,8 @@ while True:
     frame = picam2.capture_array()
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    blurframe = cv2.GaussianBlur(frame, (5,5), 0)
-    lab = cv2.cvtColor(blurframe, cv2.COLOR_BGR2LAB)
+    # blurframe = cv2.GaussianBlur(frame, (5,5), 0)
+    lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
     lower = np.array([60, 100, 160])
     upper = np.array([255, 180, 230])
@@ -50,7 +50,6 @@ while True:
 
     cv2.imshow("lab", lab)
     cv2.imshow("frame", frame)
-    cv2.imshow("blur", blurframe)
     cv2.imshow("mask", mask)
 
     if cv2.waitKey(1) == 27:
