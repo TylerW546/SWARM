@@ -37,8 +37,10 @@ while True:
         v.state = State.WANDER
         
     if v.state == State.INIT_CHILD:
+        print("I am child")
         v.start_test(MovementState.FOLLOW_TARGET_COLOR)
         time.sleep(1)
+        v.state = State.WANDER
         
 
     if v.uwb.uwb_messages_recieved:
