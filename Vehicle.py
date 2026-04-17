@@ -146,7 +146,7 @@ class Vehicle:
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
-                self.pid.move_straight(speed=command[1], seconds=command[2])
+                self.pid.move_straight(speed=command[1], distance=command[2])
             elif command[0] == "rotate_right":
                 self.pid.rotate_right(degrees=command[1])
             elif command[0] == "rotate_left":
@@ -220,11 +220,11 @@ class Vehicle:
                 command = commands[self.movement_data["current_command_index"]]
 
                 if self.movement_data["current_command_index"] == 1:
-                    self.movement_data["last_forward_time"] = self.pid.state_values.get("time_elapsed", 0)
+                    self.movement_data["last_forward_distance"] = self.pid.state_values.get("final_distance", 0)
                 if self.movement_data["current_command_index"] == 2:
                     # Adjust backward time based on how long the forward command took
-                    forward_time = self.movement_data.get("last_forward_time", 1)
-                    command = ("straight", -MOTOR_SPEED, forward_time)
+                    forward_distance = self.movement_data.get("last_forward_distance", 1)
+                    command = ("straight", -MOTOR_SPEED, forward_distance)
                         
                 self.movement_data["current_command_index"] += 1
                 self.movement_queue.append(command)
@@ -251,7 +251,7 @@ class Vehicle:
             data["state"] = BoustrophedonState.LONG
 
         elif state == BoustrophedonState.LONG:
-            self.pid.move_straight(speed=MOTOR_SPEED, seconds=3)
+            self.pid.move_straight(speed=MOTOR_SPEED, distance=3)
             if data["current_lane"] % 2 == 0: 
                 data["state"] = BoustrophedonState.TURNING_RIGHT_LONG
             else:
@@ -266,7 +266,7 @@ class Vehicle:
             data["state"] = BoustrophedonState.SHORT 
 
         elif state == BoustrophedonState.SHORT:
-            self.pid.move_straight(speed=MOTOR_SPEED, seconds=1)
+            self.pid.move_straight(speed=MOTOR_SPEED, distance=1)
             if data["current_lane"] % 2 == 0: 
                 data["state"] = BoustrophedonState.TURNING_RIGHT_SHORT
             else:
