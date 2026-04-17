@@ -25,7 +25,7 @@ while True:
     lab = cv2.cvtColor(blurframe, cv2.COLOR_BGR2LAB)
 
     lower = np.array([120, 100, 160])
-    upper = np.array([255, 160, 230])
+    upper = np.array([255, 180, 230])
 
     print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
     cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
