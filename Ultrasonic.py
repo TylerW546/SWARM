@@ -33,7 +33,7 @@ class UltrasonicSensor:
         elif level == 0:  # Falling edge (Echo ends)
             if self.pulse_start > 0:
                 duration = tick - self.pulse_start
-                print(f"end tick: {tick} (duration={duration / 1000000000})")
+                # print(f"end tick: {tick} (duration={duration / 1000000000})")
                 # Distance in cm = (nanoseconds * speed of sound) / 2 / 1,000,000
                 self.distance = (duration * 343) / 2 / 1000000000
                 self.pulse_start = 0
