@@ -107,7 +107,6 @@ class Vehicle:
     def close_all(self):
         self.camera.stop()
         self.pid.close()
-        self.driver.close()
         lgpio.gpiochip_close(self.chip)
 
     def start_test(self, state):

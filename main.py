@@ -114,6 +114,7 @@ while True:
     if v.uwb.requesting_reset:
         # close all resources and restart the program
         v.close_all()
+        time.sleep(1)
         try:
             os.execv("/bin/bash", ["bash", "../start.sh", "no_new_screen"])
         except Exception as e:
