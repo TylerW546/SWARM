@@ -17,13 +17,12 @@ picam2.start()
 time.sleep(1)
 
 while True:
-    cv2.circle(frame, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
 
     frame = picam2.capture_array()
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    frame = cv2.GaussianBlur(frame, (5,5), 0)
-    lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+    blurframe = cv2.GaussianBlur(frame, (5,5), 0)
+    lab = cv2.cvtColor(blurframe, cv2.COLOR_BGR2LAB)
 
     lower = np.array([120, 130, 150])
     upper = np.array([255, 200, 255])
@@ -46,18 +45,8 @@ while True:
             break
     # cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
 
-    # Find centroid
-    moments = cv2.moments(mask)
-    if moments["m00"] > 0:
-        cx = int(moments["m10"] / moments["m00"])
-        cy = int(moments["m01"] / moments["m00"])
-        # print("Found at:", cx, cy)
-
-        # draw for debugging
-        cv2.circle(frame, center=(cx, cy), radius=100, color=(255, 0, 0), thickness=2)
-
     cv2.imshow("frame", frame)
-    cv2.imshow("lab", lab)
+    cv2.imshow("blur", blurframe)
     cv2.imshow("mask", mask)
 
     if cv2.waitKey(1) == 27:
