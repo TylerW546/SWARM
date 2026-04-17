@@ -21,7 +21,7 @@ while True:
     frame = picam2.capture_array()
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    # blurframe = cv2.GaussianBlur(frame, (5,5), 0)
+    frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
     lower = np.array([60, 100, 160])
@@ -33,7 +33,7 @@ while True:
 
     mask = cv2.inRange(lab, lower, upper)
 
-    kernel = np.ones((5,5), np.uint8)
+    kernel = np.ones((7,7), np.uint8)
     # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
     pixel_count = cv2.countNonZero(mask)
