@@ -17,20 +17,22 @@ picam2.start()
 time.sleep(1)
 
 while True:
-    frame = picam2.capture_array()
+    cv2.circle(frame, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
 
-    # Convert to HSV
-    lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
+    frame = picam2.capture_array()
     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 
-    cv2.circle(frame, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
-    print(frame[IMAGE_WIDTH//2][IMAGE_HEIGHT//2])
+    frame = cv2.GaussianBlur(frame, (5,5), 0)
+    lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    # For tracking something bright orange
-    lower = np.array([0, 164, 147])
-    upper = np.array([255, 200, 200])
+    lower = np.array([120, 130, 150])
+    upper = np.array([255, 200, 255])
 
     mask = cv2.inRange(lab, lower, upper)
+
+    kernel = np.ones((5,5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
     pixel_count = cv2.countNonZero(mask)
 
     circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
