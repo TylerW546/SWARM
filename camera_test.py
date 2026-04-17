@@ -24,7 +24,7 @@ while True:
     blurframe = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(blurframe, cv2.COLOR_BGR2LAB)
 
-    lower = np.array([120, 100, 120])
+    lower = np.array([120, 100, 160])
     upper = np.array([255, 160, 230])
 
     print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
