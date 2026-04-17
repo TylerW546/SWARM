@@ -42,7 +42,9 @@ class pidController:
         lgpio.gpio_claim_alert(chip, encoder_r_pin, lgpio.RISING_EDGE)
         self.cb_right = lgpio.callback(chip, encoder_r_pin, lgpio.RISING_EDGE, self.encoder_right_callback)
 
-
+    def close(self):
+        self.cb_left.cancel()
+        self.cb_right.cancel()
 
     def move_straight(self, speed, distance):
         """
