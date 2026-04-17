@@ -24,7 +24,7 @@ while True:
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    lower = np.array([60, 100, 120])
+    lower = np.array([60, 100, 130])
     upper = np.array([255, 180, 230])
 
     print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
@@ -33,7 +33,7 @@ while True:
     mask = cv2.inRange(lab, lower, upper)
 
     kernel = np.ones((7,7), np.uint8)
-    # mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
     pixel_count = cv2.countNonZero(mask)
 
