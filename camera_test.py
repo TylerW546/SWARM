@@ -25,7 +25,7 @@ while True:
     lab = cv2.cvtColor(blurframe, cv2.COLOR_BGR2LAB)
 
     lower = np.array([120, 100, 170])
-    upper = np.array([255, 140, 230])
+    upper = np.array([255, 160, 230])
 
     # print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
     # cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
@@ -33,9 +33,6 @@ while True:
 
     mask = cv2.inRange(lab, lower, upper)
 
-    kernel = np.ones((5,5), np.uint8)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_DILATE, kernel)
     pixel_count = cv2.countNonZero(mask)
 
     circles = cv2.HoughCircles(mask, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
