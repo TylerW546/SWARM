@@ -42,19 +42,21 @@ while True:
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
     # Threshold (tune this)
-    t = 5
+
+    r = 1.2
     # Create mask: red dominant pixels
-    red_mask = ((R > G + t) & (R > B + t)).astype(np.uint8) * 255
-
-    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
-    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
+    red_mask = (R.astype(float) / (G + 1) > r &
+            (R.astype(float) / (B + 1) > r)).astype(np.uint8) * 255
     
-    # all points for which red is greater than blue and green
-
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    print("Color at image center:", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
+    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
+    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
+    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
+    
+    # all points for which red is greater than blue and green
+
 
     # Read slider values
     l_min = cv2.getTrackbarPos("L_min", "Controls")
@@ -93,7 +95,7 @@ while True:
     cv2.circle(lab, (IMAGE_WIDTH//2, IMAGE_HEIGHT//2), 10, (0, 0, 255), 2)
 
     cv2.imshow("lab", lab)
-    cv2.imshow("frame", frame_rgb)
+    cv2.imshow("frame_rgb", frame_rgb)
     cv2.imshow("orange", orange)
 
     if cv2.waitKey(1) == 27:
