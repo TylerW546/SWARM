@@ -37,6 +37,23 @@ while True:
     frame = picam2.capture_array()
     frame = cv2.flip(frame, 0)
 
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    R = frame_rgb[:, :, 0]
+    G = frame_rgb[:, :, 1]
+    B = frame_rgb[:, :, 2]
+
+    # Threshold (tune this)
+    t = 30
+
+    # Create mask: red dominant pixels
+    red_mask = ((R > G + t) & (R > B + t)).astype(np.uint8) * 255
+
+    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
+    
+    # all points for which red is greater than blue and green
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
