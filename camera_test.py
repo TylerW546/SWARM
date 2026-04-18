@@ -1,5 +1,20 @@
+from picamera2 import Picamera2
 import cv2
 import numpy as np
+import time
+
+IMAGE_WIDTH = 400
+IMAGE_HEIGHT = 400
+
+picam2 = Picamera2()
+config = picam2.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT)})
+picam2.configure(config)
+picam2.set_controls({
+    "AeEnable": False,  # Disable auto exposure
+    "AwbEnable": False, # Disable auto white balance
+})
+picam2.start()
+time.sleep(1)
 
 # Create a window for sliders
 cv2.namedWindow("Controls")
