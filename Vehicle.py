@@ -213,11 +213,11 @@ class Vehicle:
         else:
             commands = [
                 ("straight", MOTOR_SPEED, 1), # forward
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
                 ("straight", -MOTOR_SPEED, 1), # backward
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
                 ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
-                ("wait", 0, 0.5),
+                ("wait", 0.5),
             ]
             if self.movement_data["current_command_index"] < len(commands):
                 command = commands[self.movement_data["current_command_index"]]
@@ -255,13 +255,13 @@ class Vehicle:
         else:
             commands = [
                 ("straight", MOTOR_SPEED, 1), # forward     # 0
-                ("wait", 0, 0.5),                           # 1
+                ("wait", 0.5),                              # 1
                 ("rotate", 90), # degrees                   # 2
-                ("wait", 0, 4.0),                           # 3
+                ("wait", 4.0),                              # 3
                 ("straight", MOTOR_SPEED, 0.2), # forward   # 4
-                ("wait", 0, 0.5),                           # 5        
+                ("wait", 0.5),                              # 5        
                 ("rotate", 90), # degrees                   # 6
-                ("wait", 0, 4.0),                           # 7
+                ("wait", 4.0),                              # 7
             ]
             
             if self.movement_data["current_command_index"] < len(commands):
