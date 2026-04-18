@@ -19,6 +19,7 @@ time.sleep(1)
 while True:
 
     frame = picam2.capture_array()
+    frame = cv2.flip(frame, 0)
 
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
@@ -61,7 +62,7 @@ while True:
     cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
     
 
-    cv2.imshow("lab", lab)
+    cv2.imshow("lab", lab[, ])
     cv2.imshow("frame", frame)
     cv2.imshow("orange", orange)
 
