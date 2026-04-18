@@ -41,11 +41,10 @@ while True:
     R = frame_rgb[:, :, 0]
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
-    # Threshold (tune this)
 
     r = 1.2
     # Create mask: red dominant pixels
-    red_mask = (R.astype(float) / (G + 1) > r &
+    red_mask = ((R.astype(float) / (G + 1) > r) &
             (R.astype(float) / (B + 1) > r)).astype(np.uint8) * 255
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
