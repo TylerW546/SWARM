@@ -28,7 +28,7 @@ class pidController:
         
         # --- PID Constants ---
         self.Kp = 0.75  # Proportional 
-        self.Ki = 0.02 # Integral
+        self.Ki = 0.1 # Integral
         self.Kd = 0.0  # Derivative
 
         # --- PID State variables ---
