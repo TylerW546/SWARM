@@ -18,12 +18,13 @@ def camera_process(camera):
         return None, None, 0, 0
 
     frame = camera.capture_array()
+    frame = cv2.flip(frame, 0)
 
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
 
     # orange
-    lower = np.array([60, 100, 130])
+    lower = np.array([60, 100, 150])
     upper = np.array([255, 180, 230])
     orange = cv2.inRange(lab, lower, upper)
 
