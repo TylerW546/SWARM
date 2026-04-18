@@ -19,8 +19,8 @@ IMAGE_HEIGHT = 480//2
 
 VISUALIZE = False
 
-MOTOR_SPEED = 50
-TURN_SPEED = 30
+MOTOR_SPEED = 60
+TURN_SPEED = 40
 
 # Wheel encoder to distance values
 WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # Circumference in meters
