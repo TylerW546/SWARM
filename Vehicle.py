@@ -165,7 +165,7 @@ class Vehicle:
         self.pid.update()
 
     def celebration_movement(self): 
-        self.command_queue.append(("rotate_right", self.movement_data["degrees"]))
+        self.movement_queue.append(("rotate_right", self.movement_data["degrees"]))
         self.movement_state = MovementState.IDLE
 
     def follow_target_color(self):
