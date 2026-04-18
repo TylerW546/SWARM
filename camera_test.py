@@ -28,7 +28,7 @@ while True:
     print("Color at image center: ", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
 
     # orange
-    lower = np.array([60, 110, 130])
+    lower = np.array([60, 110, 140])
     upper = np.array([255, 180, 230])
     orange = cv2.inRange(lab, lower, upper)
 
