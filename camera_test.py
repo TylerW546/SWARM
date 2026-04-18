@@ -25,11 +25,12 @@ def nothing(x):
 
 # Create trackbars for lower + upper LAB
 cv2.createTrackbar("L_min", "Controls", 0, 255, nothing)
-cv2.createTrackbar("A_min", "Controls", 0, 255, nothing)
-cv2.createTrackbar("B_min", "Controls", 0, 255, nothing)
-
 cv2.createTrackbar("L_max", "Controls", 255, 255, nothing)
+
+cv2.createTrackbar("A_min", "Controls", 0, 255, nothing)
 cv2.createTrackbar("A_max", "Controls", 255, 255, nothing)
+
+cv2.createTrackbar("B_min", "Controls", 0, 255, nothing)
 cv2.createTrackbar("B_max", "Controls", 255, 255, nothing)
 
 while True:
