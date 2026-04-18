@@ -257,11 +257,11 @@ class Vehicle:
                 ("straight", MOTOR_SPEED, 1), # forward     # 0
                 ("wait", 0, 0.5),                           # 1
                 ("rotate", 90), # degrees                   # 2
-                ("wait", 0, 0.5),                           # 3
+                ("wait", 0, 4.0),                           # 3
                 ("straight", MOTOR_SPEED, 0.2), # forward   # 4
                 ("wait", 0, 0.5),                           # 5        
                 ("rotate", 90), # degrees                   # 6
-                ("wait", 0, 0.5),                           # 7
+                ("wait", 0, 4.0),                           # 7
             ]
             
             if self.movement_data["current_command_index"] < len(commands):
