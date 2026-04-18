@@ -42,7 +42,7 @@ while True:
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
 
-    r = 1.05
+    r = 1
     # Create mask: red dominant pixels
     red_mask = ((R.astype(float) / (G + 1) > r) &
             (R.astype(float) / (B + 1) > r)).astype(np.uint8) * 255
