@@ -62,7 +62,8 @@ class MovementState(Enum):
     HUB_SPOKE = 2
     BOUSTROPHEDON = 3
     FOLLOW_TARGET_COLOR = 4
-    
+    CELEBRATION = 5
+
 class PID_State(Enum):
     IDLE = 1
     WAITING = 2

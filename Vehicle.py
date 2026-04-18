@@ -145,6 +145,8 @@ class Vehicle:
                 self.boustrophedon_movement()
             elif self.movement_state == MovementState.FOLLOW_TARGET_COLOR:
                 self.follow_target_color()
+            elif self.movement_state == MovementState.CELEBRATION:
+                self.celebration_movement()
 
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
@@ -160,6 +162,10 @@ class Vehicle:
         
         self.uwb.update()
         self.pid.update()
+
+    def celebration_movement(self): 
+        self.command_queue.append(("rotate_right", self.movement_data["degrees"]))
+        self.movement_state = MovementState.IDLE
 
     def follow_target_color(self):
         # If we see the target, move towards it
@@ -247,6 +253,14 @@ class Vehicle:
 
     def boustrophedon_movement(self):
         if self.pid.state != PID_State.IDLE:
+            return
+
+        cx, cy, cr, pixel_count = camera_process(self.camera)
+        if cr > 0:
+            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
+            self.movement_queue = []
+            self.movement_state = MovementState.CELEBRATION
+            self.movement_data = {"degrees": 360*2}
             return
 
         if self.movement_data["current_lane"] >= self.movement_data["total_lanes"]:
