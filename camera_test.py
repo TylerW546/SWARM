@@ -38,14 +38,11 @@ while True:
     frame = cv2.flip(frame, 0)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
     R = frame_rgb[:, :, 0]
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
-
     # Threshold (tune this)
-    t = 30
-
+    t = 5
     # Create mask: red dominant pixels
     red_mask = ((R > G + t) & (R > B + t)).astype(np.uint8) * 255
 
