@@ -27,9 +27,9 @@ class pidController:
         self.state_values = {}
         
         # --- PID Constants ---
-        self.Kp = 3.0  # Proportional 
-        self.Ki = 0.2 # Integral
-        self.Kd = 2.0  # Derivative
+        self.Kp = 0.5  # Proportional
+        self.Ki = 0.5 # Integral
+        self.Kd = 1.0  # Derivative
 
         # --- PID State variables ---
         self.integral = 0
