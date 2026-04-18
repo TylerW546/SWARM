@@ -62,7 +62,7 @@ while True:
     cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
     
 
-    cv2.imshow("lab", lab[, ])
+    cv2.imshow("lab", lab)
     cv2.imshow("frame", frame)
     cv2.imshow("orange", orange)
 
