@@ -19,7 +19,7 @@ IMAGE_HEIGHT = 480//2
 
 VISUALIZE = False
 
-MOTOR_SPEED = 70
+MOTOR_SPEED = 50
 TURN_SPEED = 50
 
 # Wheel encoder to distance values
