@@ -249,7 +249,7 @@ class Vehicle:
         if self.pid.state != PID_State.IDLE:
             return
 
-        if self.movement_data["curent_lane"] >= self.movement_data["total_lanes"]:
+        if self.movement_data["current_lane"] >= self.movement_data["total_lanes"]:
             self.movement_state = MovementState.IDLE
             print("Test complete!")
         else:
