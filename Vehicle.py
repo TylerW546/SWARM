@@ -149,6 +149,14 @@ class Vehicle:
             elif self.movement_state == MovementState.CELEBRATION:
                 self.celebration_movement()
 
+        cx, cy, cr, pixel_count = camera_process(self.camera)
+        if cr > 0:
+            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
+            self.movement_queue = []
+            self.movement_state = MovementState.CELEBRATION
+            self.movement_data = {"degrees": 360*2}
+            return
+
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
@@ -254,14 +262,6 @@ class Vehicle:
 
     def boustrophedon_movement(self):
         if self.pid.state != PID_State.IDLE:
-            return
-
-        cx, cy, cr, pixel_count = camera_process(self.camera)
-        if cr > 0:
-            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
-            self.movement_queue = []
-            self.movement_state = MovementState.CELEBRATION
-            self.movement_data = {"degrees": 360*2}
             return
 
         if self.movement_data["current_lane"] >= self.movement_data["total_lanes"]:
