@@ -24,14 +24,14 @@ def nothing(x):
     pass
 
 # Create trackbars for lower + upper LAB
-cv2.createTrackbar("L_min", "Controls", 0, 255, nothing)
-cv2.createTrackbar("L_max", "Controls", 255, 255, nothing)
+cv2.createTrackbar("L_min", "Controls", 0, 255, 53)
+cv2.createTrackbar("L_max", "Controls", 255, 255, 153)
 
-cv2.createTrackbar("A_min", "Controls", 0, 255, nothing)
-cv2.createTrackbar("A_max", "Controls", 255, 255, nothing)
+cv2.createTrackbar("A_min", "Controls", 0, 255, 80)
+cv2.createTrackbar("A_max", "Controls", 255, 255, 140)
 
-cv2.createTrackbar("B_min", "Controls", 0, 255, nothing)
-cv2.createTrackbar("B_max", "Controls", 255, 255, nothing)
+cv2.createTrackbar("B_min", "Controls", 0, 255, 67)
+cv2.createTrackbar("B_max", "Controls", 255, 255, 140)
 
 while True:
     frame = picam2.capture_array()
