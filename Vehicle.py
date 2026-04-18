@@ -284,6 +284,6 @@ class Vehicle:
                 self.movement_data["current_command_index"] += 1
                 self.movement_queue.append(command)
             else:
-                self.movement_data["current_iteration"] += 1
+                self.movement_data["current_lane"] += 1
                 self.movement_data["current_command_index"] = 0
                 
