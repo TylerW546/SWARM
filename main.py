@@ -38,7 +38,7 @@ while True:
         
     if v.state == State.INIT_CHILD:
         print("I am child")
-        v.start_test(MovementState.HUB_SPOKE)
+        v.start_test(MovementState.BOUSTROPHEDON)
         time.sleep(1)
         v.state = State.WANDER
         

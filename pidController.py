@@ -109,6 +109,8 @@ class pidController:
             self.straight_update()
         elif self.state == PID_State.TURNING_RIGHT:
             self.rotate_right_update()
+        elif self.state == PID_State.TURNING_LEFT:
+            self.rotate_left_update()
         elif self.state == PID_State.WAITING:
             self.wait_update()
 

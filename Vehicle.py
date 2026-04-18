@@ -133,13 +133,15 @@ class Vehicle:
         elif state == MovementState.HUB_SPOKE:
             self.movement_state = MovementState.HUB_SPOKE
             self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
+        elif state == MovementState.BOUSTROPHEDON:
+            self.boustrophedon_init()
 
     def update(self):
         if self.pid.state == PID_State.IDLE or self.pid.state == PID_State.OVERRIDE:
             if self.movement_state == MovementState.HUB_SPOKE:
                 self.hub_spoke_movement()
             elif self.movement_state == MovementState.BOUSTROPHEDON:
-                pass
+                self.boustrophedon_movement()
             elif self.movement_state == MovementState.FOLLOW_TARGET_COLOR:
                 self.follow_target_color()
 
