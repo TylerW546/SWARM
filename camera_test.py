@@ -46,14 +46,13 @@ while True:
     # Create mask: red dominant pixels
     red_mask = ((R > G + t) & (R > B + t)).astype(np.uint8) * 255
 
+    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     frame = cv2.bitwise_and(frame, frame, mask=red_mask)
     
     # all points for which red is greater than blue and green
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     print("Color at image center:", lab[IMAGE_HEIGHT//2, IMAGE_WIDTH//2])
 
