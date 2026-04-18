@@ -24,8 +24,8 @@ def camera_process(camera):
     lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
 
     # orange
-    lower = np.array([60, 100, 150])
-    upper = np.array([255, 180, 230])
+    lower = np.array([53, 80, 67])
+    upper = np.array([153, 140, 140])
     orange = cv2.inRange(lab, lower, upper)
 
     # # blue
