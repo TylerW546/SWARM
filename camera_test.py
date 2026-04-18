@@ -32,7 +32,7 @@ while True:
 
     # orange
     lower = np.array([60, 100, 100])
-    upper = np.array([255, 140, 140])
+    upper = np.array([180, 140, 140])
     orange = cv2.inRange(lab, lower, upper)
 
     # # blue
