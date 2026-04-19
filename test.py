@@ -24,7 +24,7 @@ IR_PIN = 26
 US_ECHO_PIN = 9
 US_TRIGGER_PIN = 11
 
-def run_test():
+def run_test_file():
 
     # Initialize gpio
     chip = lgpio.gpiochip_open(0)
@@ -39,13 +39,13 @@ def run_test():
         in3=IN3, in4=IN4, enb=ENB,
     )
 
-    # for _ in range(1000):
-    #     sonar.trigger()
-    #     print(f"distance={sonar.distance:.3f}m")
-        # time.sleep(0.5)
+    for _ in range(1000):
+        sonar.trigger()
+        print(f"distance={sonar.distance:.3f}m")
+        time.sleep(0.5)
 
     pid = pidController(chip, driver, ENCODER_L, ENCODER_R, IR_PIN, sonar)
-    pid.move_straight(35, 1)
+    # pid.move_straight(35, 1)
 
     while (1):
         pid.update()
@@ -81,4 +81,4 @@ def run_test():
     driver.cleanup()
 
 if __name__ == "__main__":
-    run_test()
+    run_test_file()
