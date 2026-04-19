@@ -7,7 +7,7 @@ IMAGE_WIDTH = 400
 IMAGE_HEIGHT = 400
 
 picam2 = Picamera2()
-config = picam2.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT)})
+config = picam2.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"})
 picam2.configure(config)
 picam2.set_controls({
     "AeEnable": False,  # Disable auto exposure
@@ -35,7 +35,7 @@ cv2.createTrackbar("B_max", "Controls", 140, 255, nothing)
 
 while True:
     frame = picam2.capture_array()
-    frame = cv2.flip(frame, 0)
+    frame = cv2.flip(frame, -1)
 
     frame_rgb = frame
     R = frame_rgb[:, :, 0]
