@@ -22,7 +22,7 @@ IR_PIN = 26
 
 # Ultrasonic sensor
 US_ECHO_PIN = 9
-US_TRIGGER_PIN = 11
+US_TRIGGER_PIN = 26
 
 def run_test_file():
 

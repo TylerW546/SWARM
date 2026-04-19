@@ -44,7 +44,7 @@ IR_PIN = 26
 
 # Ultrasonic sensor
 US_ECHO_PIN = 9
-US_TRIGGER_PIN = 11
+US_TRIGGER_PIN = 26
 DISTANCE_THRESHOLD = 0.3
 
 from enum import Enum 
