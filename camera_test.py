@@ -44,8 +44,8 @@ while True:
 
     r = 1
     # Create mask: red dominant pixels
-    red_mask = ((R.astype(float) / max(G.astype(float) + 1, 1) > r) &
-            (R.astype(float) / max(B.astype(float) + 1, 1) > r)).astype(np.uint8) * 255
+    red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
+            (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
