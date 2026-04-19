@@ -37,7 +37,7 @@ while True:
     frame = picam2.capture_array()
     frame = cv2.flip(frame, -1)
 
-    frame_rgb = frame
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     R = frame_rgb[:, :, 0]
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
