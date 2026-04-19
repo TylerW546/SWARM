@@ -74,7 +74,7 @@ while True:
     small_kernel = np.ones((5,5), np.uint8)
     kernel = np.ones((7,7), np.uint8)
 
-    orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
+    # orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
     orange = cv2.morphologyEx(orange, cv2.MORPH_DILATE, kernel)
 
     orange_circles = cv2.HoughCircles(
