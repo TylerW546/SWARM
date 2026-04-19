@@ -27,7 +27,7 @@ def nothing(x):
 cv2.createTrackbar("L_min", "Controls", 0, 255, nothing)
 cv2.createTrackbar("L_max", "Controls", 255, 255, nothing)
 
-cv2.createTrackbar("A_min", "Controls", 80, 255, nothing)
+cv2.createTrackbar("A_min", "Controls", 130, 255, nothing)
 cv2.createTrackbar("A_max", "Controls", 255, 255, nothing)
 
 cv2.createTrackbar("B_min", "Controls", 140, 255, nothing)
@@ -76,7 +76,7 @@ while True:
     small_kernel = np.ones((3,3), np.uint8)
     kernel = np.ones((5,5), np.uint8)
 
-    orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
+    # orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
     orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
     orange = cv2.morphologyEx(orange, cv2.MORPH_DILATE, kernel)
 
