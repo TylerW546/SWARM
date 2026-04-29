@@ -59,7 +59,6 @@ class UWBInterface:
 
     def update(self):
         for line in self.ser.lines_read:
-            print(f"Processing line: {line}")
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
                 self.finished_discovery = True
@@ -75,6 +74,11 @@ class UWBInterface:
                 self.uwb_messages_recieved.append(line[5:-1])
             elif line.startswith("*DIST:"):
                 self.is_ranging = False
+                self.dist = float(line[6:-1])
+                print(f"Received distance: {self.dist}m")
+            else:
+                print(f"Don't know how to process line: {line}")
+                
 
             self.ser.lines_read.remove(line)
         self.ser.update()
