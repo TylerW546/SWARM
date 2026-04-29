@@ -50,7 +50,7 @@ while True:
         if frame_count % 20 == 0:
             print("Wandering...")
             if leader:
-                v.uwb.send_uwb_message("LEADER_ALIVE")
+                v.uwb.enter_ranging_mode()
 
     if v.uwb.uwb_messages_recieved:
         print("Received UWB messages:")
