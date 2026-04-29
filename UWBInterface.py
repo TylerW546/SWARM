@@ -70,10 +70,12 @@ class UWBInterface:
             
             if "~" in line:
                 tildaindex = line.index("~")
-                line = line[:tildaindex]  # Get the part before the delimiter
+                line = line[:tildaindex+1]  # Get the part before the delimiter
                 rest = line[tildaindex+1:]  # Get the part after the delimiter
                 self.ser.lines_read.insert(0, rest)  # Add the processed line back to the
-                
+
+            print(f"Processing line: {line}")
+            
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
                 self.finished_discovery = True
@@ -87,6 +89,7 @@ class UWBInterface:
             elif line.startswith("*REC:"):
                 # Process range response
                 self.uwb_messages_recieved.append(line[5:-1])
+                
             elif line.startswith("*DIST:"):
                 self.is_ranging = False
                 self.dist = float(line[6:-1])
