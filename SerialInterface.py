@@ -34,8 +34,8 @@ class SerialInterface:
                 self.ser = serial.Serial(
                     self.serial_port,
                     self.baudrate,
-                    timeout=1,        # 1 second timeout
-                    write_timeout=1
+                    timeout=0,        # 1 second timeout
+                    write_timeout=0
                 )
                 print(f"Serial port {self.serial_port} opened.")
                 return self.ser
