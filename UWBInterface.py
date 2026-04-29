@@ -66,12 +66,14 @@ class UWBInterface:
         #split self.ser.lines into commands by "~" delimiter, and process each command separately
         while len(self.ser.lines_read) > 0:
             line = self.ser.lines_read[0]
+            self.ser.lines_read = self.ser.lines_read[1:]  # Remove the original line
+            
             if "~" in line:
                 tildaindex = line.index("~")
-                processing_line = line[:tildaindex]  # Get the part before the delimiter
-                self.ser.lines_read = self.ser.lines_read[1:]  # Remove the original line
-                self.ser.lines_read.insert(0, processing_line)  # Add the processed line back to the
-
+                line = line[:tildaindex]  # Get the part before the delimiter
+                rest = line[tildaindex+1:]  # Get the part after the delimiter
+                self.ser.lines_read.insert(0, rest)  # Add the processed line back to the
+                
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
                 self.finished_discovery = True
