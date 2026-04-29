@@ -21,6 +21,7 @@ class UWBInterface:
         self.messages = []
 
         self.is_ranging = False
+        self.range_start_time = None
         
         self.uwb_messages_recieved = []
 
@@ -37,10 +38,14 @@ class UWBInterface:
     def enter_ranging_mode(self):
         if self.is_ranging:
             print("Already ranging, cannot enter ranging mode again.")
+            if time.time() - self.range_start_time > 5:
+                print("Been ranging for a while, resetting ranging state.")
+                self.is_ranging = False
             return None
         uwb_message = UWBMessage(content=None, timestamp=time.time(), id=UWBMessage.range_id)
         self.ser.add_to_send_queue("*RANGE~")
         self.is_ranging = True
+        self.range_start_time = time.time()
         return uwb_message
 
     def send_uwb_message(self, message):
