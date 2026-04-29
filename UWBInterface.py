@@ -80,7 +80,8 @@ class UWBInterface:
             elif line.startswith("*DIST:"):
                 self.is_ranging = False
                 self.dist = float(line[6:-1])
-                print(f"Received distance: {self.dist}m")
+                self.send_uwb_message(f"GOT_DIST:{self.dist}")
+                # print(f"Received distance: {self.dist}m")
             else:
                 print(f"Don't know how to process line: {line}")
                 

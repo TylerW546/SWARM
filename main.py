@@ -55,6 +55,9 @@ while True:
         print("Received UWB messages:")
         for msg in v.uwb.uwb_messages_recieved:
             print(msg)
+            if msg.startswith("GOT_DIST:"):
+                dist = float(msg[9:])
+                print(f"Distance received from child: {dist}m")
             if msg == "RESETTING":
                 print("Other just reset, starting...")
         v.uwb.uwb_messages_recieved = []
