@@ -47,7 +47,7 @@ while True:
         v.state = State.WANDER
 
     if v.state == State.WANDER:
-        if frame_count % frames_per_second == 0:
+        if frame_count % 10 == 0:
             if leader:
                 v.uwb.enter_ranging_mode()
 

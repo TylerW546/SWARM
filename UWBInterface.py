@@ -63,7 +63,15 @@ class UWBInterface:
         self.ser.add_to_send_queue(f"*RANGE_QUERY:{message.message_id}~")
 
     def update(self):
-        for line in self.ser.lines_read:
+        #split self.ser.lines into commands by "~" delimiter, and process each command separately
+        while len(self.ser.lines_read) > 0:
+            line = self.ser.lines_read[0]
+            if "~" in line:
+                tildaindex = line.index("~")
+                processing_line = line[:tildaindex]  # Get the part before the delimiter
+                self.ser.lines_read.remove(line)  # Remove the original line
+                self.ser.lines_read.insert(0, processing_line)  # Add the processed line back to the
+
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
                 self.finished_discovery = True
