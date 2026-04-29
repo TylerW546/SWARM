@@ -16,7 +16,7 @@ class SerialInterface:
     def send_message(self, message):
         try:
             self.ser.write((message + '\n').encode())
-            print(f"Sent: {message}")
+            # print(f"Sent: {message}")
             return True
         except OSError as e:
             print(f"Serial I/O error: {e}")

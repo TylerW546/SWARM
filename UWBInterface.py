@@ -74,7 +74,7 @@ class UWBInterface:
                 rest = line[tildaindex+1:]  # Get the part after the delimiter
                 self.ser.lines_read.insert(0, rest)  # Add the processed line back to the
 
-            print(f"Processing line: {line}")
+            # print(f"Processing line: {line}")
             
             if line.startswith("*DISC_COMPLETE:"):
                 self.is_discovering = False
