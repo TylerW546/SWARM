@@ -214,8 +214,11 @@ class Vehicle:
         self.pid.update()
 
     def celebration_movement(self): 
-        self.movement_queue.append(("rotate_right", self.movement_data["degrees"]))
-        self.movement_state = MovementState.IDLE
+        if self.movement_data.get("done_rotation", False) == False:
+            self.movement_queue.append(("rotate_right", self.movement_data["degrees"]))
+            self.movement_data["done_rotation"] = True
+        else:
+            self.movement_state = MovementState.IDLE
 
     def follow_target_color(self):
         # If we see the target, move towards it
