@@ -22,7 +22,7 @@ VISUALIZE = True
 SEEN_FRAMES_THRESHOLD = 4
 
 MOTOR_SPEED = 60
-TURN_SPEED = 40
+TURN_SPEED = 60
 
 # Wheel encoder to distance values
 WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # Circumference in meters

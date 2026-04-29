@@ -159,7 +159,7 @@ class pidController:
         left_speed = TURN_SPEED - adjustment
         right_speed = -(TURN_SPEED + adjustment)
 
-        # print(f"({left_speed}, {right_speed})")
+        print(f"({left_speed}, {right_speed})")
 
         # 5. Apply the new speeds to the motors
         self.motor_driver.motor_left_rotate(left_speed)
