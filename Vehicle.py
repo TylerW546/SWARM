@@ -18,32 +18,57 @@ def camera_process(camera):
         return None, None, 0, 0
 
     frame = camera.capture_array()
-    frame = cv2.flip(frame, 0)
+    frame = cv2.flip(frame, -1)
 
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    R = frame_rgb[:, :, 0]
+    G = frame_rgb[:, :, 1]
+    B = frame_rgb[:, :, 2]
+
+    r = 1
+    # Create mask: red dominant pixels
+    red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
+            (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
+    
     frame = cv2.GaussianBlur(frame, (5,5), 0)
-    lab = cv2.cvtColor(frame, cv2.COLOR_RGB2LAB)
+    lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    # orange
-    lower = np.array([53, 80, 67])
-    upper = np.array([153, 140, 140])
+    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
+
+    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
+    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
+    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
+    
+    # all points for which red is greater than blue and green
+
+
+    # Read slider values
+    l_min = 0
+    a_min = 130
+    b_min = 140
+
+    l_max = 255
+    a_max = 255
+    b_max = 255
+
+    lower = np.array([l_min, a_min, b_min])
+    upper = np.array([l_max, a_max, b_max])
+
     orange = cv2.inRange(lab, lower, upper)
 
-    # # blue
-    # lower = np.array([100, 100, 100])
-    # upper = np.array([255, 180, 230])
-    # blue = cv2.inRange(cv2.cvtColor(frame, cv2.COLOR_RGB2HSV), lower, upper)
-    
+    small_kernel = np.ones((3,3), np.uint8)
+    kernel = np.ones((5,5), np.uint8)
 
-    small_kernel = np.ones((5,5), np.uint8)
-    kernel = np.ones((7,7), np.uint8)
+    # orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
     orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
     orange = cv2.morphologyEx(orange, cv2.MORPH_DILATE, kernel)
-    
-    # blue = cv2.morphologyEx(blue, cv2.MORPH_OPEN, small_kernel)
-    # blue = cv2.morphologyEx(blue, cv2.MORPH_DILATE, kernel)
-    
 
-    orange_circles = cv2.HoughCircles(orange, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
+    orange_circles = cv2.HoughCircles(
+        orange, cv2.HOUGH_GRADIENT,
+        dp=1, minDist=20,
+        param1=50, param2=30,
+        minRadius=5, maxRadius=1000
+    )
     # blue_circles = cv2.HoughCircles(blue, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
     if orange_circles is not None:
         orange_circles = np.uint16(np.around(orange_circles))
