@@ -77,7 +77,7 @@ def camera_process(camera):
         cv2.imshow("orange", orange)
 
     if cv2.waitKey(1) == 27:
-        break
+        return None, None, 0, 0
     
     # blue_circles = cv2.HoughCircles(blue, cv2.HOUGH_GRADIENT, dp=1, minDist=20, param1=50, param2=30, minRadius=5, maxRadius=1000)
     if orange_circles is not None:
