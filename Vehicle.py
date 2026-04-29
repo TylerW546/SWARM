@@ -189,6 +189,7 @@ class Vehicle:
         if cr > 0 and self.movement_state != MovementState.CELEBRATION:
             print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
             self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
+            print(f"Seen target count: {self.movement_data['seen_target_count']}")
             if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
                 self.movement_queue = []
                 self.movement_state = MovementState.CELEBRATION
