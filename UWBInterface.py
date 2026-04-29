@@ -92,7 +92,5 @@ class UWBInterface:
                 # print(f"Received distance: {self.dist}m")
             else:
                 print(f"Don't know how to process line: {line}")
-                
 
-            self.ser.lines_read.remove(line)
         self.ser.update()
