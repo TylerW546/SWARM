@@ -127,7 +127,8 @@ class Vehicle:
 
         try:
             self.camera = Picamera2()
-            self.camera.configure(self.camera.create_preview_configuration(main={"size": (IMAGE_WIDTH, IMAGE_HEIGHT)}))
+            config = Picamera2.picam2.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"})
+            self.camera.configure(config)
             self.camera.start()
         except Exception as e:
             print("Camera initialization failed:", e)
