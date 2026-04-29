@@ -11,13 +11,15 @@ def get_ip():
         s.close()
     return ip
 
+def get_index_from_uuid
+
 PIXEL_COUNT_THRESHOLD = 300
 PIXEL_COUNT_UPPER_THRESHOLD = 3000
 
 IMAGE_WIDTH = 640//2
 IMAGE_HEIGHT = 480//2
 
-VISUALIZE = True
+VISUALIZE = False
 
 SEEN_FRAMES_THRESHOLD = 4
 
