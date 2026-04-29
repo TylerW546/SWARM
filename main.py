@@ -134,6 +134,8 @@ while True:
         except Exception as e:
             print(f"Failed to reset: {e}")
 
+    if time.time() - frame_start >= FRAME_DURATION:
+        print(f"Warning: Frame took {time.time() - frame_start:.3f} seconds, which is longer than the target frame duration of {FRAME_DURATION} seconds.")
     while time.time() - frame_start < FRAME_DURATION:
         pass
 
