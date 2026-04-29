@@ -90,30 +90,7 @@ def camera_process(camera):
                 cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
             return i[0], i[1], i[2], cv2.countNonZero(orange)
 
-    # cv2.circle(lab, center=(IMAGE_WIDTH//2, IMAGE_HEIGHT//2), radius=10, color=(0, 0, 255), thickness=2)
-    
-
-    # cv2.imshow("lab", lab)
-    # cv2.imshow("frame", frame)
-    # cv2.imshow("orange", orange)
-
-        
-    # # Find centroid
-    # moments = cv2.moments(mask)
-    # if moments["m00"] > 0:
-    #     cx = int(moments["m10"] / moments["m00"])
-    #     cy = int(moments["m01"] / moments["m00"])
-    #     if VISUALIZE:
-    #         cv2.circle(frame, center=(cx, cy), radius=100, color=(255, 0, 0), thickness=2)
-
-    # if VISUALIZE:
-    #     cv2.imshow("frame", frame)
-    #     cv2.imshow("mask", mask)
-    #     cv2.waitKey(1)
-
     return None, None, 0, 0
-
-
 
 import uuid
 

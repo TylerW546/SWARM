@@ -9,9 +9,14 @@ import numpy as np
 v = Vehicle()
 
 last_frame_time = time.time()
+frame_count = 0
+frames_per_second = int(1.0 / FRAME_DURATION)
+leader = False
 
 while True:
     frame_start = time.time()
+    frame_count += 1
+    
     # print("Frame time: ", frame_start - last_frame_time)
     last_frame_time = frame_start
     
@@ -31,17 +36,21 @@ while True:
 
     if v.state == State.INIT_PARENTING:
         print("I am leader")
+        leader = True
         v.start_test(MovementState.BOUSTROPHEDON)
         # uwb.enter_ranging_mode()
-        time.sleep(1)
         v.state = State.WANDER
         
     if v.state == State.INIT_CHILD:
         print("I am child")
         v.start_test(MovementState.BOUSTROPHEDON)
-        time.sleep(1)
         v.state = State.WANDER
-        
+
+    if v.state == State.WANDER:
+        if frame_count % 20 == 0:
+            print("Wandering...")
+            if leader:
+                v.uwb.send_uwb_message("LEADER_ALIVE")
 
     if v.uwb.uwb_messages_recieved:
         print("Received UWB messages:")
@@ -123,7 +132,7 @@ while True:
         except Exception as e:
             print(f"Failed to reset: {e}")
 
-    while time.time() - frame_start < 0.05:
+    while time.time() - frame_start < FRAME_DURATION:
         pass
 
 this_vehicle = Vehicle()
