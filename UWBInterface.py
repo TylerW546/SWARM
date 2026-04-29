@@ -69,7 +69,7 @@ class UWBInterface:
             if "~" in line:
                 tildaindex = line.index("~")
                 processing_line = line[:tildaindex]  # Get the part before the delimiter
-                self.ser.lines_read.remove(line)  # Remove the original line
+                self.ser.lines_read = self.ser.lines_read[1:]  # Remove the original line
                 self.ser.lines_read.insert(0, processing_line)  # Add the processed line back to the
 
             if line.startswith("*DISC_COMPLETE:"):
