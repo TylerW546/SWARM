@@ -127,7 +127,7 @@ class Vehicle:
 
         try:
             self.camera = Picamera2()
-            config = Picamera2.picam2.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"})
+            config = self.camera.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"})
             self.camera.configure(config)
             self.camera.start()
         except Exception as e:
