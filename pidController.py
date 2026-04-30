@@ -199,7 +199,7 @@ class pidController:
 
         self.speed_history.append(self.speeds.copy())
         self.signal_history.append(self.signals.copy())
-        print(self.signals[LEFT_WHEEL], self.signals[RIGHT_WHEEL])
+        log(self.signals[LEFT_WHEEL], self.signals[RIGHT_WHEEL])
 
     def rotate_left_update(self):
         # The control loop
@@ -257,7 +257,7 @@ class pidController:
         # 3. Calculate total adjustment
         adjustment = -(P + I + D)
 
-        print(f"[{wheel}]: error={error:.2f}, integral={self.integrals[wheel]:.2f}, ({P:.2f}, {I:.2f}, {D:.2f}) |{adjustment:.2f}|, future={self.signals[wheel] + adjustment:.2f}")
+        log(f"[{wheel}]: error={error:.2f}, integral={self.integrals[wheel]:.2f}, ({P:.2f}, {I:.2f}, {D:.2f}) |{adjustment:.2f}|, future={self.signals[wheel] + adjustment:.2f}")
 
         self.prev_error[wheel] = error
 
