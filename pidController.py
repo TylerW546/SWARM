@@ -316,7 +316,7 @@ class pidController:
         sign = -1 if self.state_values["target_speed"] < 0 else 1
         self.motor_driver.motor_left_rotate(sign*self.signals[LEFT_WHEEL])
         self.motor_driver.motor_right_rotate(sign*self.signals[RIGHT_WHEEL])
-        log(sign*self.signals[LEFT_WHEEL], sign*self.signals[RIGHT_WHEEL])
+        log(f"[SIGNALS]: {sign*self.signals[LEFT_WHEEL]}, {sign*self.signals[RIGHT_WHEEL]}")
 
         self.speed_history.append(self.speeds.copy())
         self.signal_history.append(self.signals.copy())
