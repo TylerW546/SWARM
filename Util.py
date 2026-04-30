@@ -33,14 +33,14 @@ ENCODER_COUNT = 20 # Counts per rotation
 COUNT_TO_METERS = WHEEL_CIRC_METERS / ENCODER_COUNT
 
 # Right motor
-IN1 = 17
-IN2 = 27
+IN1 = 23
+IN2 = 24
 ENA = 25 # PWM 25
 ENCODER_R = 16
 
 # Left motor
-IN3 = 23
-IN4 = 24
+IN3 = 17
+IN4 = 27
 ENB = 22 # PWM 22
 ENCODER_L = 19
 
