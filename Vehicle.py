@@ -238,7 +238,7 @@ class Vehicle:
                 print("Hub spoke result: failed")
             elif self.movement_data["current_command_index"] == 2: # after waiting command
                 print(f"end of spoke, current distance: {self.uwb.dist}m")
-                if self.uwb.dist < self.movement_data["initial_distance"] - 0.5: # if we got significantly closer, consider it a success
+                if self.uwb.dist < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
                     self.movement_data["done_hub_spoke"] = True
                     self.movement_data["hub_spoke_result"] = "closer"
                     print("Hub spoke result: closer")

@@ -61,7 +61,7 @@ while True:
             if msg.startswith("GOT_DIST:"):
                 dist = float(msg[9:])
                 v.uwb.dist = dist
-                print(f"Distance received from child: {dist}m")
+                # print(f"Distance received from child: {dist}m")
             elif msg == "RESETTING" and not leader:
                 v.uwb.requesting_reset = True
             elif msg == "FOUND_TARGET" and v.movement_state != MovementState.CONVERGENCE:
