@@ -24,7 +24,7 @@ SEEN_FRAMES_THRESHOLD = 2
 # seconds
 FRAME_DURATION = 0.080
 
-MOTOR_SPEED = 40
+MOTOR_SPEED = 30
 TURN_SPEED = 20
 
 # Wheel encoder to distance values
