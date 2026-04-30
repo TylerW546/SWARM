@@ -18,6 +18,8 @@ def camera_process(camera):
         return None, None, 0, 0
 
     frame = camera.capture_array()
+    #downsample for faster processing
+    frame = frame[::2, ::2]
     frame = cv2.flip(frame, -1)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
