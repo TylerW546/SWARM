@@ -210,7 +210,8 @@ class Vehicle:
 
     def start_convergence(self):
         self.movement_state = MovementState.CONVERGENCE
-        self.movement_data = {"done_hub_spoke": False, "initial_distance": self.uwb.dist, 
+        self.movement_data = {"done_hub_spoke": False, "hub_spoke_result": None,
+                              "initial_distance": self.uwb.dist, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0}
         self.movement_queue.append(("wait", 1))
 
