@@ -85,6 +85,10 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
+                if self.is_leader:
+                    self.send_uwb_message("RESETTING")
+                    self.ser.update()
+                    
                 self.requesting_reset = True
             elif line.startswith("*REC:"):
                 # Process range response
