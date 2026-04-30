@@ -199,7 +199,7 @@ class pidController:
 
         self.speed_history.append(self.speeds.copy())
         self.signal_history.append(self.signals.copy())
-        log(self.signals[LEFT_WHEEL], self.signals[RIGHT_WHEEL])
+        log(f"[SIGNALS]: {self.signals[LEFT_WHEEL]}, {self.signals[RIGHT_WHEEL]}")
 
     def rotate_left_update(self):
         # The control loop
@@ -275,7 +275,7 @@ class pidController:
         distance_traveled = counts * COUNT_TO_METERS
 
         if distance_traveled >= distance:
-            log("Movement complete. Final Encoder Counts:", self.encoder_count)
+            # log("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             self.motor_driver.stop_all()
             self.state_values = {
