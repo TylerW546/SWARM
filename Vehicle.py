@@ -211,14 +211,15 @@ class Vehicle:
     def start_convergence(self):
         self.movement_state = MovementState.CONVERGENCE
         self.movement_data = {"done_hub_spoke": False, "hub_spoke_result": None,
-                              "initial_distance": self.uwb.dist, 
+                              "initial_distance": None, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0,
                               "forward_done": False}
         self.movement_queue.append(("wait", 1))
 
     def convergence_movement(self):
         if self.movement_data.get("done_hub_spoke", False) == False:
-            self.movement_data["initial_distance"] = self.uwb.dist
+            if self.movement_data.get("initial_distance", None) is None:
+                self.movement_data["initial_distance"] = self.uwb.dist
             print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
             self.hub_spoke_movement()
             if self.movement_state == MovementState.IDLE: # hub spoke complete
