@@ -111,41 +111,31 @@ class pidController:
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
-        # Reset encoder counts and PID state for a clean run
-        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.integral = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
 
-        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.reset_pid()
 
         # Encoder counts to reach
-        counts = degrees/6
+        counts = degrees/5
 
         self.state = PID_State.TURNING_RIGHT
-        self.state_values = {"counts": counts}
+        self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
 
         # Tell the L298N library to start rotating
-        self.motor_driver.motor_left_rotate(TURN_SPEED)
-        self.motor_driver.motor_right_rotate(-TURN_SPEED)
+        self.motor_driver.motor_left_rotate(-TURN_SPEED)
+        self.motor_driver.motor_right_rotate(TURN_SPEED)
 
     def rotate_left(self, degrees):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
-        # Reset encoder counts and PID state for a clean run
-        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.integral = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-
-        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
-        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        
+        self.reset_pid()
 
         # Encoder counts to reach
         counts = degrees/6
 
         self.state = PID_State.TURNING_LEFT
-        self.state_values = {"counts": counts}
+        self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
 
         # Tell the L298N library to start rotating
         self.motor_driver.motor_left_rotate(-TURN_SPEED)
@@ -184,36 +174,32 @@ class pidController:
             self.state = PID_State.IDLE
 
     def rotate_right_update(self):
-        # The control loop
+
+        if self.state != PID_State.TURNING_RIGHT:
+            print("BAD!")
+            return
+
         if (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) >= self.state_values["counts"]:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
+            self.motor_driver.stop_all()
             self.state = PID_State.IDLE
             return
 
-        # 1. Calculate the Error
-        # If positive: Left is spinning faster. If negative: Right is spinning faster.
-        error = self.encoder_count[LEFT_WHEEL] - self.encoder_count[RIGHT_WHEEL]
+        left_speed_adj = self.pid_one_wheel(LEFT_WHEEL)
+        right_speed_adj = self.pid_one_wheel(RIGHT_WHEEL)
 
-        # 2. Calculate PID terms
-        P = self.Kp * error
-        self.integral["left"] += error
-        I = self.Ki * self.integral["left"]
-        D = self.Kd * (error - self.prev_error["left"])
+        # Apply the new speeds to the motors
+        self.signals[LEFT_WHEEL] += left_speed_adj
+        self.signals[RIGHT_WHEEL] += right_speed_adj
+        self.signals[LEFT_WHEEL] = min(100, max(0, self.signals[LEFT_WHEEL]))
+        self.signals[RIGHT_WHEEL] = min(100, max(0, self.signals[RIGHT_WHEEL]))
 
-        # 3. Calculate total adjustment
-        adjustment = P + I + D
-        self.prev_error["left"] = error
+        self.motor_driver.motor_left_rotate(-self.signals[LEFT_WHEEL])
+        self.motor_driver.motor_right_rotate(self.signals[RIGHT_WHEEL])
 
-        # 4. Apply adjustment to the base speeds
-        # If error is positive, we subtract adjustment from left and add to right.
-        left_speed = TURN_SPEED - adjustment
-        right_speed = -(TURN_SPEED + adjustment)
-
-        # print(f"({left_speed}, {right_speed})")
-
-        # 5. Apply the new speeds to the motors
-        self.motor_driver.motor_left_rotate(left_speed)
-        self.motor_driver.motor_right_rotate(right_speed)
+        self.speed_history.append(self.speeds.copy())
+        self.signal_history.append(self.signals.copy())
+        print(self.signals[LEFT_WHEEL], self.signals[RIGHT_WHEEL])
 
     def rotate_left_update(self):
         # The control loop
@@ -302,6 +288,7 @@ class pidController:
         # Only stop if we're moving forward and detect an object
         if self.sonar.distance > 0 and self.sonar.distance < DISTANCE_THRESHOLD and speed > 0:
             print("Object detected during straight movement! Stopping.")
+            self.motor_driver.stop_all()
             self.state = PID_State.IDLE
             counts = (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) // 2
             final_distance = counts * COUNT_TO_METERS
