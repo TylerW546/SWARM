@@ -250,7 +250,9 @@ class Vehicle:
                 print("Convergence movement: moving forward")
             elif self.movement_data["hub_spoke_result"] == "failed":
                 self.movement_state = MovementState.IDLE
+                self.movement_data["forward_done"] = True
                 print("Convergence movement: hub spoke failed, not moving forward")
+                
             else:
                 self.movement_state = MovementState.IDLE
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
