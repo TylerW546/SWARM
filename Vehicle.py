@@ -38,11 +38,7 @@ def camera_process(camera):
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-
-
-    blue_frame = cv2.bitwise_and(frame_rgb, frame_rgb, mask=blue_mask)
-    red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
-    double_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
+    # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
     l_min = 0
@@ -67,7 +63,7 @@ def camera_process(camera):
 
     orange_circles = cv2.HoughCircles(
         orange, cv2.HOUGH_GRADIENT,
-        dp=1, minDist=20,
+        dp=2, minDist=20,
         param1=50, param2=30,
         minRadius=5, maxRadius=1000
     )
@@ -76,7 +72,6 @@ def camera_process(camera):
 
         cv2.imshow("lab", lab)
         cv2.imshow("red_mask", red_mask)
-        cv2.imshow("blue_frame", blue_frame)
         cv2.imshow("orange", orange)
         cv2.imshow("double_mask", expanded_blue_and_red_mask)
 
