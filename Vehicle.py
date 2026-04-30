@@ -156,19 +156,6 @@ class Vehicle:
             self.boustrophedon_init()
 
     def update(self):
-        cx, cy, cr, pixel_count = camera_process(self.camera)
-        if cr > 0 and self.movement_state != MovementState.CELEBRATION:
-            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
-            self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
-            print(f"Seen target count: {self.movement_data['seen_target_count']}")
-            if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
-                self.movement_queue = []
-                self.movement_state = MovementState.CELEBRATION
-                self.movement_data = {"degrees": 360*2} 
-                return
-        else:
-            self.movement_data["seen_target_count"] = 0
-        
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
@@ -192,7 +179,18 @@ class Vehicle:
             elif self.movement_state == MovementState.CONVERGENCE:
                 self.convergence_movement()
 
-        
+        cx, cy, cr, pixel_count = camera_process(self.camera)
+        if cr > 0 and self.movement_state != MovementState.CELEBRATION:
+            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
+            self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
+            print(f"Seen target count: {self.movement_data['seen_target_count']}")
+            if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
+                self.movement_queue = []
+                self.movement_state = MovementState.CELEBRATION
+                self.movement_data = {"degrees": 360*2} 
+                return
+        else:
+            self.movement_data["seen_target_count"] = 0
 
         
 
@@ -218,13 +216,16 @@ class Vehicle:
                               "initial_distance": None, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0,
                               "forward_done": False}
-        self.movement_queue.append(("wait", 10))
 
     def convergence_movement(self):
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
+                self.movement_queue.append(("wait", 1))
+                self.movement_data["initial_distance"] = "waiting"
+            elif self.movement_data["initial_distance"] == "waiting":
                 self.movement_data["initial_distance"] = self.uwb.dist
                 print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
+
             self.hub_spoke_movement()
             if self.movement_state == MovementState.IDLE: # hub spoke complete
                 self.movement_state = MovementState.CONVERGENCE
