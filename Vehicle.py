@@ -220,7 +220,7 @@ class Vehicle:
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
                 self.movement_data["initial_distance"] = self.uwb.dist
-            print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
+                print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
             self.hub_spoke_movement()
             if self.movement_state == MovementState.IDLE: # hub spoke complete
                 self.movement_state = MovementState.CONVERGENCE
