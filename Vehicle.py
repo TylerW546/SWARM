@@ -29,20 +29,22 @@ def camera_process(camera):
     # Create mask: red dominant pixels
     red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
             (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
+
+    blue_mask = (((B.astype(float) / (G.astype(float) + 1)) > r) &
+            (B.astype(float) / (R.astype(float) + 1) > r).astype(np.uint8) * 255)
+    
+    expanded_blue_mask = cv2.dilate(blue_mask, np.ones((7,7), np.uint8), iterations=1)
+    expanded_blue_and_red_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
 
-    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
-    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
-    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
+    blue_frame = cv2.bitwise_and(frame_rgb, frame_rgb, mask=blue_mask)
+    red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
+    double_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
+    lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
-    # all points for which red is greater than blue and green
-
-
-    # Read slider values
     l_min = 0
     a_min = 130
     b_min = 140
@@ -56,7 +58,7 @@ def camera_process(camera):
 
     orange = cv2.inRange(lab, lower, upper)
 
-    small_kernel = np.ones((3,3), np.uint8)
+    small_kernel = np.ones((2,2), np.uint8)
     kernel = np.ones((5,5), np.uint8)
 
     # orange = cv2.morphologyEx(orange, cv2.MORPH_OPEN, small_kernel)
@@ -73,8 +75,10 @@ def camera_process(camera):
         cv2.circle(lab, (IMAGE_WIDTH//2, IMAGE_HEIGHT//2), 10, (0, 0, 255), 2)
 
         cv2.imshow("lab", lab)
-        cv2.imshow("frame_rgb", frame_rgb)
+        cv2.imshow("red_mask", red_mask)
+        cv2.imshow("blue_frame", blue_frame)
         cv2.imshow("orange", orange)
+        cv2.imshow("double_mask", expanded_blue_and_red_mask)
 
     if cv2.waitKey(1) == 27:
         return None, None, 0, 0
@@ -85,9 +89,10 @@ def camera_process(camera):
         for i in orange_circles[0, :]:
             if VISUALIZE: 
                 # draw the outer circle
-                cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+                cv2.circle(red_mask, (i[0], i[1]), i[2], (0, 255, 0), 2)
                 # draw the center of the circle
-                cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
+                cv2.circle(red_mask, (i[0], i[1]), 2, (0, 0, 255), 3)
+                cv2.imshow("red_mask", red_mask)
             return i[0], i[1], i[2], cv2.countNonZero(orange)
 
     return None, None, 0, 0
