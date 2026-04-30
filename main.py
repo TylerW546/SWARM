@@ -43,7 +43,9 @@ while True:
         
     if v.state == State.INIT_CHILD:
         print("I am child")
-        v.start_test(MovementState.BOUSTROPHEDON)
+        # v.start_test(MovementState.BOUSTROPHEDON)
+        v.start_convergence()
+        
         v.state = State.WANDER
 
     if v.state == State.WANDER:
