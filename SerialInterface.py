@@ -16,7 +16,7 @@ class SerialInterface:
     def send_message(self, message):
         try:
             self.ser.write((message + '\n').encode())
-            print(f"Sent: {message}")
+            # print(f"Sent: {message}")
             return True
         except OSError as e:
             print(f"Serial I/O error: {e}")
@@ -34,8 +34,8 @@ class SerialInterface:
                 self.ser = serial.Serial(
                     self.serial_port,
                     self.baudrate,
-                    timeout=1,        # 1 second timeout
-                    write_timeout=1
+                    timeout=0,        # 1 second timeout
+                    write_timeout=0
                 )
                 print(f"Serial port {self.serial_port} opened.")
                 return self.ser

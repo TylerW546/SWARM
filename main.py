@@ -47,15 +47,17 @@ while True:
         v.state = State.WANDER
 
     if v.state == State.WANDER:
-        if frame_count % 20 == 0:
-            print("Wandering...")
+        if frame_count % 10 == 1:
             if leader:
-                v.uwb.send_uwb_message("LEADER_ALIVE")
+                v.uwb.enter_ranging_mode()
 
     if v.uwb.uwb_messages_recieved:
         print("Received UWB messages:")
         for msg in v.uwb.uwb_messages_recieved:
             print(msg)
+            if msg.startswith("GOT_DIST:"):
+                dist = float(msg[9:])
+                print(f"Distance received from child: {dist}m")
             if msg == "RESETTING":
                 print("Other just reset, starting...")
         v.uwb.uwb_messages_recieved = []
@@ -132,6 +134,8 @@ while True:
         except Exception as e:
             print(f"Failed to reset: {e}")
 
+    if time.time() - frame_start >= FRAME_DURATION:
+        print(f"Warning: Frame took {time.time() - frame_start:.3f} seconds, which is longer than the target frame duration of {FRAME_DURATION} seconds.")
     while time.time() - frame_start < FRAME_DURATION:
         pass
 
