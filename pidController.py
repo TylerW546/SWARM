@@ -79,11 +79,8 @@ class pidController:
         self.cb_left.cancel()
         self.cb_right.cancel()
 
-    def move_straight(self, speed, distance):
-        """
-        Drives the robot straight forward using PID control to balance motor speeds.
-        """
-        # Reset encoder counts and PID state for a clean run
+    def reset_pid(self):
+        """Reset encoder counts and PID state for a clean run"""
 
         self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
         self.integrals = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
@@ -94,6 +91,14 @@ class pidController:
         self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
 
         self.pid_start = time.perf_counter()
+
+
+    def move_straight(self, speed, distance):
+        """
+        Drives the robot straight forward using PID control to balance motor speeds.
+        """
+
+        self.reset_pid()
 
         self.state = PID_State.STRAIGHT
         self.state_values = {"target_speed": speed, "distance": distance}
