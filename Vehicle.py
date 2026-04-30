@@ -223,7 +223,7 @@ class Vehicle:
     def convergence_movement(self):
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
-                self.movement_queue.append(("wait", 1))
+                self.movement_queue.append(("wait", 4))
                 self.movement_data["initial_distance"] = "waiting"
             elif self.movement_data["initial_distance"] == "waiting":
                 self.movement_data["initial_distance"] = self.uwb.dist
