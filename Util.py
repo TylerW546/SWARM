@@ -25,7 +25,7 @@ SEEN_FRAMES_THRESHOLD = 2
 FRAME_DURATION = 0.080
 
 MOTOR_SPEED = 40
-TURN_SPEED = 60
+TURN_SPEED = 35
 
 # Wheel encoder to distance values
 WHEEL_CIRC_METERS = 2 * 3.1415 * 0.035 # Circumference in meters
