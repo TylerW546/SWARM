@@ -121,7 +121,7 @@ class pidController:
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
 
         # Tell the L298N library to start rotating
-        self.motor_driver.motor_left_rotate(TURN_SPEED)
+        # self.motor_driver.motor_left_rotate(TURN_SPEED)
         self.motor_driver.motor_right_rotate(-TURN_SPEED)
 
     def rotate_left(self, degrees):
@@ -138,7 +138,7 @@ class pidController:
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
 
         # Tell the L298N library to start rotating
-        # self.motor_driver.motor_left_rotate(-TURN_SPEED)
+        self.motor_driver.motor_left_rotate(-TURN_SPEED)
         self.motor_driver.motor_right_rotate(TURN_SPEED)
 
     def update(self):
