@@ -1,5 +1,6 @@
 import time
 import os
+import uuid
 
 class UWBMessage:
     regular_message_ID = 0
@@ -88,6 +89,8 @@ class UWBInterface:
                 print("UWB just reset")
                 if self.is_leader:
                     print("Sending reset message to children")
+                    self.assign_id(str(uuid.getnode()))
+                    
                     self.send_uwb_message("RESETTING")
                     self.ser.update()
                     
