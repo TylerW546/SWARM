@@ -18,6 +18,8 @@ def camera_process(camera):
         return None, None, 0, 0
 
     frame = camera.capture_array()
+    #downsample for faster processing
+    frame = frame[::2, ::2]
     frame = cv2.flip(frame, -1)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -25,7 +27,7 @@ def camera_process(camera):
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
 
-    r = 1
+    r = 1.1
     # Create mask: red dominant pixels
     red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
             (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
@@ -38,11 +40,7 @@ def camera_process(camera):
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-
-
-    blue_frame = cv2.bitwise_and(frame_rgb, frame_rgb, mask=blue_mask)
-    red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
-    double_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
+    # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
     l_min = 0
@@ -76,7 +74,6 @@ def camera_process(camera):
 
         cv2.imshow("lab", lab)
         cv2.imshow("red_mask", red_mask)
-        cv2.imshow("blue_frame", blue_frame)
         cv2.imshow("orange", orange)
         cv2.imshow("double_mask", expanded_blue_and_red_mask)
 

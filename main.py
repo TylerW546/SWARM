@@ -22,7 +22,6 @@ while True:
     
     if v.state == State.INIT_DEVICE_DISCOVERY:
         if not v.uwb.is_discovering and not v.uwb.finished_discovery:
-            v.uwb.send_uwb_message("RESETTING")
             v.uwb.enter_discovery_mode()
 
         if v.uwb.finished_discovery:
@@ -58,8 +57,8 @@ while True:
             if msg.startswith("GOT_DIST:"):
                 dist = float(msg[9:])
                 print(f"Distance received from child: {dist}m")
-            if msg == "RESETTING":
-                print("Other just reset, starting...")
+            if msg == "RESETTING" and not leader:
+                v.uwb.requesting_reset = True
         v.uwb.uwb_messages_recieved = []
     # elif v.state == State.INIT_PARENTING:
     #     print("I am the leader")

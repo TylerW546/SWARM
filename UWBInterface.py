@@ -1,5 +1,6 @@
 import time
 import os
+import uuid
 
 class UWBMessage:
     regular_message_ID = 0
@@ -85,6 +86,14 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
+                print("UWB just reset")
+                if self.is_leader:
+                    print("Sending reset message to children")
+                    self.assign_id(str(uuid.getnode()))
+                    
+                    self.send_uwb_message("RESETTING")
+                    self.ser.update()
+                    
                 self.requesting_reset = True
             elif line.startswith("*REC:"):
                 # Process range response
