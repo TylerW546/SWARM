@@ -54,9 +54,10 @@ while True:
                 v.uwb.enter_ranging_mode()
 
     if v.uwb.uwb_messages_recieved:
-        print("Received UWB messages:")
+        # print("Received UWB messages:")
         for msg in v.uwb.uwb_messages_recieved:
-            print(msg)
+            if not msg.startswith("GOT"):
+                print("got " + msg)
             if msg.startswith("GOT_DIST:"):
                 dist = float(msg[9:])
                 v.uwb.dist = dist
