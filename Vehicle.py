@@ -156,6 +156,17 @@ class Vehicle:
             self.boustrophedon_init()
 
     def update(self):
+        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
+            command = self.movement_queue.pop(0)
+            if command[0] == "straight":
+                self.pid.move_straight(speed=command[1], distance=command[2])
+            elif command[0] == "rotate_right":
+                self.pid.rotate_right(degrees=command[1])
+            elif command[0] == "rotate_left":
+                self.pid.rotate_left(degrees=command[1])
+            elif command[0] == "wait":
+                self.pid.wait(seconds=command[1])
+
         if self.pid.state == PID_State.IDLE or self.pid.state == PID_State.OVERRIDE:
             if self.movement_state == MovementState.HUB_SPOKE:
                 self.hub_spoke_movement()
@@ -181,16 +192,7 @@ class Vehicle:
         else:
             self.movement_data["seen_target_count"] = 0
 
-        if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
-            command = self.movement_queue.pop(0)
-            if command[0] == "straight":
-                self.pid.move_straight(speed=command[1], distance=command[2])
-            elif command[0] == "rotate_right":
-                self.pid.rotate_right(degrees=command[1])
-            elif command[0] == "rotate_left":
-                self.pid.rotate_left(degrees=command[1])
-            elif command[0] == "wait":
-                self.pid.wait(seconds=command[1])
+        
 
         
         self.uwb.update()
@@ -214,7 +216,7 @@ class Vehicle:
                               "initial_distance": None, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0,
                               "forward_done": False}
-        self.movement_queue.append(("wait", 1))
+        self.movement_queue.append(("wait", 10))
 
     def convergence_movement(self):
         if self.movement_data.get("done_hub_spoke", False) == False:
