@@ -63,7 +63,7 @@ def camera_process(camera):
 
     orange_circles = cv2.HoughCircles(
         orange, cv2.HOUGH_GRADIENT,
-        dp=2, minDist=20,
+        dp=1, minDist=20,
         param1=50, param2=30,
         minRadius=5, maxRadius=1000
     )
