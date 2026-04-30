@@ -185,9 +185,7 @@ class Vehicle:
             self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
             print(f"Seen target count: {self.movement_data['seen_target_count']}")
             if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
-                self.movement_queue = []
-                self.movement_state = MovementState.CELEBRATION
-                self.movement_data = {"degrees": 360*2} 
+                self.start_celebration()
                 return
         else:
             self.movement_data["seen_target_count"] = 0
@@ -198,6 +196,11 @@ class Vehicle:
         self.uwb.update()
         self.pid.update()
 
+    def start_celebration(self):
+        self.movement_queue = []
+        self.movement_state = MovementState.CELEBRATION
+        self.movement_data = {"degrees": 360*2} 
+        
     def celebration_movement(self): 
         if self.movement_data.get("done_rotation", False) == False:
             self.movement_queue.append(("rotate_right", self.movement_data["degrees"]))
@@ -253,9 +256,16 @@ class Vehicle:
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
 
         # convergence forward movement done, but hit obstacle.
-        elif self.pid.state_values.get("last_state_success", True) == False:
+        elif self.uwb.dist < 0.3:
+            self.movement_state = MovementState.IDLE
+            self.start_celebration()
             print("Convergence is done")
             
+        elif self.pid.state_values.get("last_state_success", True) == False:
+            print("Convergence movement: obstacle detected, stopping movement")
+
+
+                
             
         
     def follow_target_color(self):
