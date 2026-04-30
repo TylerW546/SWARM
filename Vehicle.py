@@ -27,7 +27,7 @@ def camera_process(camera):
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
 
-    r = 1
+    r = 1.1
     # Create mask: red dominant pixels
     red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
             (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
