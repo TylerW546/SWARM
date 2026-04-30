@@ -252,7 +252,8 @@ class Vehicle:
                 self.movement_state = MovementState.IDLE
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
 
-        else:
+        # convergence forward movement done, but hit obstacle.
+        elif self.pid.state_values.get("last_state_success", True) == False:
             print("Convergence is done")
             
             
