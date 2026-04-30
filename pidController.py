@@ -191,13 +191,13 @@ class pidController:
 
         # 2. Calculate PID terms
         P = self.Kp * error
-        self.integral += error
-        I = self.Ki * self.integral
-        D = self.Kd * (error - self.prev_error)
+        self.integral["left"] += error
+        I = self.Ki * self.integral["left"]
+        D = self.Kd * (error - self.prev_error["left"])
 
         # 3. Calculate total adjustment
         adjustment = P + I + D
-        self.prev_error = error
+        self.prev_error["left"] = error
 
         # 4. Apply adjustment to the base speeds
         # If error is positive, we subtract adjustment from left and add to right.
@@ -223,13 +223,13 @@ class pidController:
 
         # 2. Calculate PID terms
         P = self.Kp * error
-        self.integral += error
-        I = self.Ki * self.integral
-        D = self.Kd * (error - self.prev_error)
+        self.integral["left"] += error
+        I = self.Ki * self.integral["left"]
+        D = self.Kd * (error - self.prev_error["left"])
 
         # 3. Calculate total adjustment
         adjustment = P + I + D
-        self.prev_error = error
+        self.prev_error["left"] = error
 
         # 4. Apply adjustment to the base speeds
         # If error is positive, we subtract adjustment from left and add to right.
