@@ -104,6 +104,8 @@ class Vehicle:
         self.uwb = UWBInterface(self.ser)
         self.uwb.assign_id(str(uuid.getnode()))
 
+        self.dist_to_other = 0
+
         try:
             self.camera = Picamera2()
             config = self.camera.create_preview_configuration({"size": (IMAGE_WIDTH, IMAGE_HEIGHT), "format": "RGB888"})
@@ -163,6 +165,8 @@ class Vehicle:
                 self.follow_target_color()
             elif self.movement_state == MovementState.CELEBRATION:
                 self.celebration_movement()
+            elif self.movement_state == MovementState.CONVERGENCE:
+                self.convergence_movement()
 
         cx, cy, cr, pixel_count = camera_process(self.camera)
         if cr > 0 and self.movement_state != MovementState.CELEBRATION:
@@ -197,8 +201,31 @@ class Vehicle:
             self.movement_queue.append(("rotate_right", self.movement_data["degrees"]))
             self.movement_data["done_rotation"] = True
         else:
-            self.movement_state = MovementState.IDLE
+            if self.movement_data.get("timer", 0) >= 10:
+                self.movement_data["timer"] = 0
+                self.uwb.send_message("FOUND_TARGET")
+            else:
+                self.movement_data["timer"] = self.movement_data.get("timer", 0) + 1
+                
 
+    def start_convergence(self):
+        self.movement_state = MovementState.CONVERGENCE
+        self.movement_data = {"done_hub_spoke": False, "initial_distance": self.uwb.dist, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}        
+        self.movement_queue.append(("wait", 1))
+
+    def convergence_movement(self):
+        if self.movement_data.get("done_hub_spoke", False) == False:
+            self.movement_data["done_hub_spoke"] = True
+            self.movement_data["initial_distance"] = self.uwb.dist
+            self.hub_spoke_movement()
+            if self.movement_state == MovementState.IDLE:
+                self.movement_state = MovementState.CONVERGENCE
+                self.movement_data["done_hub_spoke"] = True
+        else:
+            pass
+            
+            
+        
     def follow_target_color(self):
         # If we see the target, move towards it
         cx, cy, cr, pixel_count = camera_process(self.camera)

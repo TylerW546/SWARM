@@ -28,6 +28,8 @@ class UWBInterface:
 
         self.requesting_reset = False
 
+        self.dist = 0
+
 
     def assign_id(self, id):
         self.ser.add_to_send_queue(f"*ASSIGN_ID:{id}~")

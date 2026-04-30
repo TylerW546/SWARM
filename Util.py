@@ -68,6 +68,7 @@ class MovementState(Enum):
     BOUSTROPHEDON = 3
     FOLLOW_TARGET_COLOR = 4
     CELEBRATION = 5
+    CONVERGENCE = 6
 
 class PID_State(Enum):
     IDLE = 1

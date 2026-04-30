@@ -36,7 +36,8 @@ while True:
     if v.state == State.INIT_PARENTING:
         print("I am leader")
         leader = True
-        v.start_test(MovementState.BOUSTROPHEDON)
+        # v.start_test(MovementState.BOUSTROPHEDON)
+        v.start_convergence()
         # uwb.enter_ranging_mode()
         v.state = State.WANDER
         
@@ -56,9 +57,12 @@ while True:
             print(msg)
             if msg.startswith("GOT_DIST:"):
                 dist = float(msg[9:])
+                v.uwb.dist = dist
                 print(f"Distance received from child: {dist}m")
-            if msg == "RESETTING" and not leader:
+            elif msg == "RESETTING" and not leader:
                 v.uwb.requesting_reset = True
+            elif msg == "FOUND_TARGET" and v.movement_state != MovementState.CONVERGENCE:
+                v.start_convergence()
         v.uwb.uwb_messages_recieved = []
     # elif v.state == State.INIT_PARENTING:
     #     print("I am the leader")
