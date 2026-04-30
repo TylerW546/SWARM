@@ -2,20 +2,20 @@ import lgpio
 from Motors import L298NMotorDriver
 import time
 
-# Right motor
-IN1 = 17
-IN2 = 27
-ENA = 22 # PWM
-ENCODER_R = 4
+# # Right motor
+# IN1 = 17
+# IN2 = 27
+# ENA = 22 # PWM
+# ENCODER_R = 4
 
-# Left motor
-IN3 = 23
-IN4 = 24
-ENB = 25 # PWM
-ENCODER_L = 18
+# # Left motor
+# IN3 = 23
+# IN4 = 24
+# ENB = 25 # PWM
+# ENCODER_L = 18
 
-# IR sensor
-IR_PIN = 26
+# # IR sensor
+# IR_PIN = 26
 
 if __name__ == "__main__":
 

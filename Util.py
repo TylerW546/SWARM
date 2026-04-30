@@ -24,7 +24,7 @@ SEEN_FRAMES_THRESHOLD = 2
 # seconds
 FRAME_DURATION = 0.05
 
-MOTOR_SPEED = 60
+MOTOR_SPEED = 40
 TURN_SPEED = 60
 
 # Wheel encoder to distance values
@@ -35,13 +35,13 @@ COUNT_TO_METERS = WHEEL_CIRC_METERS / ENCODER_COUNT
 # Right motor
 IN1 = 17
 IN2 = 27
-ENA = 22 # PWM
+ENA = 25 # PWM 25
 ENCODER_R = 16
 
 # Left motor
 IN3 = 23
 IN4 = 24
-ENB = 25 # PWM
+ENB = 22 # PWM 22
 ENCODER_L = 19
 
 # IR sensor

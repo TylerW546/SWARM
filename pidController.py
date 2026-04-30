@@ -6,34 +6,67 @@ import time
 from Util import *
 from enum import Enum 
 
+LOG = False
+
+LEFT_WHEEL = "left"
+RIGHT_WHEEL = "right"
+
+def log(s):
+    if LOG:
+        print(s)
 
 class pidController:
+
+    def encoder_callback(self, wheel, timestamp):
+        self.encoder_count[wheel] += 1
+
+        elapsed = (timestamp - self.last_update[wheel]) / 1_000_000_000.
+
+        ALPHA = 0.7 # TODO: tune
+
+        measured_speed = 1. / elapsed
+        prev_speed = self.speeds[wheel]
+
+        self.speeds[wheel] = ALPHA*measured_speed + (1-ALPHA)*prev_speed
+        log(f"{wheel}: speed={self.speeds[wheel]:.2f}")
+
+        self.last_update[wheel] = timestamp
+        # log(f"[{wheel}]: Encoder count = {self.encoder_count[wheel]}")
+
     def encoder_left_callback(self, chip, gpio, level, timestamp):
-        self.encoder_count["left"] += 1
-        # print("[left]: Encoder count =", self.encoder_count["left"])
+        self.encoder_callback(LEFT_WHEEL, timestamp)
 
     def encoder_right_callback(self, chip, gpio, level, timestamp):
-        self.encoder_count["right"] += 1
-        # print("[right]: Encoder count =", self.encoder_count["right"])
+        self.encoder_callback(RIGHT_WHEEL, timestamp)
 
     def __init__(self, chip, motor_driver: L298NMotorDriver, encoder_l_pin, encoder_r_pin, sonar):
         self.motor_driver = motor_driver
         self.sonar = sonar
-        self.encoder_count = {"left": 0, "right": 0}
-        self.speeds = {"left": 0, "right": 0}
+        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.signals = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.speed_history = []
+        self.signal_history = []
+
+        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
         self.object_detected = False
 
         self.state = PID_State.IDLE
         self.state_values = {}
-        
+
         # --- PID Constants ---
-        self.Kp = 1.5  # Proportional
-        self.Ki = 0.05 # Integral
-        self.Kd = 1.0  # Derivative
+        self.Kp = 0.30  # Proportional
+        self.Ki = 0.0001 # Integral
+        self.Kd = 1.1  # Derivative
 
         # --- PID State variables ---
-        self.integral = 0
-        self.prev_error = 0
+        self.integrals = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        # --- Track update time for calculating wheel speed
+        self.pid_start = -1
 
         # Register callbacks
         lgpio.gpio_claim_alert(chip, encoder_l_pin, lgpio.RISING_EDGE)
@@ -52,25 +85,34 @@ class pidController:
         """
         # Reset encoder counts and PID state for a clean run
 
-        self.encoder_count = {"left": 0, "right": 0}
-        self.integral = 0
-        self.prev_error = 0
+        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.integrals = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.signals = {LEFT_WHEEL: MOTOR_SPEED, RIGHT_WHEEL:MOTOR_SPEED}
+        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.pid_start = time.perf_counter()
 
         self.state = PID_State.STRAIGHT
         self.state_values = {"target_speed": speed, "distance": distance}
 
         # Tell the L298N library to start moving forward
-        self.motor_driver.motor_left_rotate(speed)
-        self.motor_driver.motor_right_rotate(speed)
+        self.motor_driver.motor_left_rotate(self.signals[LEFT_WHEEL])
+        self.motor_driver.motor_right_rotate(self.signals[RIGHT_WHEEL])
 
     def rotate_right(self, degrees):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
         # Reset encoder counts and PID state for a clean run
-        self.encoder_count = {"left": 0, "right": 0}
-        self.integral = 0
-        self.prev_error = 0
+        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.integral = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
 
         # Encoder counts to reach
         counts = degrees/6
@@ -87,9 +129,12 @@ class pidController:
         Drives the robot straight forward using PID control to balance motor speeds.
         """
         # Reset encoder counts and PID state for a clean run
-        self.encoder_count = {"left": 0, "right": 0}
-        self.integral = 0
-        self.prev_error = 0
+        self.encoder_count = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.integral = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.prev_error = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+
+        self.speeds = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
+        self.last_update = {LEFT_WHEEL: 0, RIGHT_WHEEL: 0}
 
         # Encoder counts to reach
         counts = degrees/6
@@ -135,14 +180,14 @@ class pidController:
 
     def rotate_right_update(self):
         # The control loop
-        if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
+        if (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) >= self.state_values["counts"]:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             return
 
         # 1. Calculate the Error
         # If positive: Left is spinning faster. If negative: Right is spinning faster.
-        error = self.encoder_count["left"] - self.encoder_count["right"]
+        error = self.encoder_count[LEFT_WHEEL] - self.encoder_count[RIGHT_WHEEL]
 
         # 2. Calculate PID terms
         P = self.Kp * error
@@ -167,14 +212,14 @@ class pidController:
 
     def rotate_left_update(self):
         # The control loop
-        if (self.encoder_count["left"] + self.encoder_count["right"]) >= self.state_values["counts"]:
+        if (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) >= self.state_values["counts"]:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
             return
     
         # 1. Calculate the Error
         # If positive: Left is spinning faster. If negative: Right is spinning faster.
-        error = self.encoder_count["left"] - self.encoder_count["right"]
+        error = self.encoder_count[LEFT_WHEEL] - self.encoder_count[RIGHT_WHEEL]
 
         # 2. Calculate PID terms
         P = self.Kp * error
@@ -197,6 +242,37 @@ class pidController:
         self.motor_driver.motor_left_rotate(left_speed)
         self.motor_driver.motor_right_rotate(right_speed)
 
+    def pid_one_wheel(self, wheel: str) -> int:
+
+        target_speed = self.state_values["target_speed"]
+
+        # Give slightly more time before adjusting
+        elapsed = time.perf_counter() - self.pid_start
+        if elapsed < 0.1:
+            return 0
+
+        # 1. Calculate error
+        error = self.speeds[wheel] - abs(target_speed)
+
+        log(f"speed={self.speeds[wheel]:.3f}")
+
+        # 2. Calculate PID terms
+        P = self.Kp * error
+        if elapsed > .2: # Don't accumulate error for a short time
+            self.integrals[wheel] += error
+        I = self.Ki * self.integrals[wheel]
+        D = self.Kd * (error - self.prev_error[wheel])
+
+        # 3. Calculate total adjustment
+        adjustment = -(P + I + D)
+
+        print(f"[{wheel}]: error={error:.2f}, integral={self.integrals[wheel]:.2f}, ({P:.2f}, {I:.2f}, {D:.2f}) |{adjustment:.2f}|, future={self.signals[wheel] + adjustment:.2f}")
+
+        self.prev_error[wheel] = error
+
+        # 4. Apply adjustment to the base speeds
+        return adjustment
+
     def straight_update(self):
         if self.state != PID_State.STRAIGHT:
             return
@@ -204,7 +280,7 @@ class pidController:
         speed = self.state_values["target_speed"]
         distance = self.state_values["distance"]
 
-        counts = (self.encoder_count["left"] + self.encoder_count["right"]) // 2
+        counts = (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) // 2
         distance_traveled = counts * COUNT_TO_METERS
 
         if distance_traveled >= distance:
@@ -217,12 +293,12 @@ class pidController:
                 "final_distance_traveled": distance_traveled
             }
             return
-        
+
         # Only stop if we're moving forward and detect an object
         if self.sonar.distance > 0 and self.sonar.distance < DISTANCE_THRESHOLD and speed > 0:
             print("Object detected during straight movement! Stopping.")
             self.state = PID_State.IDLE
-            counts = (self.encoder_count["left"] + self.encoder_count["right"]) // 2
+            counts = (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) // 2
             final_distance = counts * COUNT_TO_METERS
             self.state_values = {
                 "last_state_success": False,
@@ -232,32 +308,23 @@ class pidController:
             }
             return
 
-        # 1. Calculate error
-        # If positive: Left is spinning faster. If negative: Right is spinning faster.
-        error = self.encoder_count["left"] - self.encoder_count["right"]
+        left_speed_adj = self.pid_one_wheel(LEFT_WHEEL)
+        right_speed_adj = self.pid_one_wheel(RIGHT_WHEEL)
 
-        # 2. Calculate PID terms
-        P = self.Kp * error
-        self.integral += error
-        I = self.Ki * self.integral
-        D = self.Kd * (error - self.prev_error)
+        elapsed = time.perf_counter() - self.pid_start
+        # log(f"elapsed={elapsed:.2f}s: ({left_speed}, {right_speed})")
 
-        # 3. Calculate total adjustment
-        adjustment = P + I + D
-        if speed < 0:
-            # Backwards
-            adjustment = -adjustment
+        # Apply the new speeds to the motors
 
-        self.prev_error = error
+        self.signals[LEFT_WHEEL] += left_speed_adj
+        self.signals[RIGHT_WHEEL] += right_speed_adj
+        self.signals[LEFT_WHEEL] = min(100, max(0, self.signals[LEFT_WHEEL]))
+        self.signals[RIGHT_WHEEL] = min(100, max(0, self.signals[RIGHT_WHEEL]))
 
-        # 4. Apply adjustment to the base speeds
-        # If error is positive, we subtract adjustment from left and add to right.
-        left_speed = speed - adjustment
-        right_speed = speed + adjustment
+        sign = -1 if self.state_values["target_speed"] < 0 else 1
+        self.motor_driver.motor_left_rotate(sign*self.signals[LEFT_WHEEL])
+        self.motor_driver.motor_right_rotate(sign*self.signals[RIGHT_WHEEL])
+        print(sign*self.signals[LEFT_WHEEL], sign*self.signals[RIGHT_WHEEL])
 
-        # print(f"({left_speed}, {right_speed})") 
-
-        # 5. Apply the new speeds to the motors
-        self.motor_driver.motor_left_rotate(left_speed)
-        self.motor_driver.motor_right_rotate(right_speed)
-
+        self.speed_history.append(self.speeds.copy())
+        self.signal_history.append(self.signals.copy())
