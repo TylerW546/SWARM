@@ -118,7 +118,7 @@ class pidController:
         counts = degrees/5
 
         self.state = PID_State.TURNING_RIGHT
-        self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
+        self.state_values = {"target_speed": TURN_SPEED, "counts": counts}        
 
         # Tell the L298N library to start rotating
         # self.motor_driver.motor_left_rotate(TURN_SPEED)
