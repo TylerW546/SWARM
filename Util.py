@@ -52,6 +52,8 @@ US_ECHO_PIN = 9
 US_TRIGGER_PIN = 26
 DISTANCE_THRESHOLD = 0.3
 
+CONVERGED_THRESHOLD = -0.5
+
 from enum import Enum 
 
 

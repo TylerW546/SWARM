@@ -258,7 +258,7 @@ class Vehicle:
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
 
         # convergence forward movement done, but hit obstacle.
-        elif self.uwb.dist < 0.3:
+        elif self.uwb.dist < CONVERGED_THRESHOLD:
             self.start_celebration()
             print("Convergence is done")
             
