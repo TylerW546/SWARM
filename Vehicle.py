@@ -219,6 +219,7 @@ class Vehicle:
     def convergence_movement(self):
         if self.movement_data.get("done_hub_spoke", False) == False:
             self.movement_data["initial_distance"] = self.uwb.dist
+            print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
             self.hub_spoke_movement()
             if self.movement_state == MovementState.IDLE: # hub spoke complete
                 self.movement_state = MovementState.CONVERGENCE
@@ -226,10 +227,12 @@ class Vehicle:
                 self.movement_data["hub_spoke_result"] = "failed"
                 print("Hub spoke result: failed")
             elif self.movement_data["current_command_index"] == 2: # after waiting command
+                print(f"end of spoke, current distance: {self.uwb.dist}m")
                 if self.uwb.dist < self.movement_data["initial_distance"]:
                     self.movement_data["done_hub_spoke"] = True
                     self.movement_data["hub_spoke_result"] = "closer"
                     print("Hub spoke result: closer")
+                    
         elif self.movement_data.get("forward_done", False) == False:
             if self.movement_data["hub_spoke_result"] == "closer":
                 self.movement_queue.append(("straight", MOTOR_SPEED, 0.5))
@@ -241,6 +244,7 @@ class Vehicle:
             else:
                 self.movement_state = MovementState.IDLE
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
+
         else:
             print("Convergence is done")
             
