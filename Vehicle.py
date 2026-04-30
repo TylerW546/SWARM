@@ -257,11 +257,11 @@ class Vehicle:
 
         # convergence forward movement done, but hit obstacle.
         elif self.uwb.dist < 0.3:
-            self.movement_state = MovementState.IDLE
             self.start_celebration()
             print("Convergence is done")
             
         elif self.pid.state_values.get("last_state_success", True) == False:
+            self.start_convergence()
             print("Convergence movement: obstacle detected, stopping movement")
 
 
