@@ -208,7 +208,7 @@ class Vehicle:
         else:
             if self.movement_data.get("timer", 0) >= 10:
                 self.movement_data["timer"] = 0
-                self.uwb.send_message("FOUND_TARGET")
+                self.uwb.send_uwb_message("FOUND_TARGET")
             else:
                 self.movement_data["timer"] = self.movement_data.get("timer", 0) + 1
                 
