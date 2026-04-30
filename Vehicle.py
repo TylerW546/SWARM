@@ -236,9 +236,12 @@ class Vehicle:
                 self.movement_queue.append(("straight", MOTOR_SPEED, 0.5))
                 self.movement_data["forward_done"] = True
                 print("Convergence movement: moving forward")
-            else:
+            elif self.movement_data["hub_spoke_result"] == "failed":
                 self.movement_state = MovementState.IDLE
                 print("Convergence movement: hub spoke failed, not moving forward")
+            else:
+                self.movement_state = MovementState.IDLE
+                print("Convergence movement: hub spoke inconclusive, not moving forward")
         else:
             print("Convergence is done")
             
