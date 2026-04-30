@@ -85,7 +85,9 @@ class UWBInterface:
                     self.is_leader = False
             elif line.startswith("*RESET~"):
                 # Process reset message
+                print("UWB just reset")
                 if self.is_leader:
+                    print("Sending reset message to children")
                     self.send_uwb_message("RESETTING")
                     self.ser.update()
                     
