@@ -35,6 +35,8 @@ cv2.createTrackbar("B_max", "Controls", 255, 255, nothing)
 
 while True:
     frame = picam2.capture_array()
+    #downsample for faster processing
+    frame = frame[::2, ::2]
     frame = cv2.flip(frame, -1)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -42,29 +44,29 @@ while True:
     G = frame_rgb[:, :, 1]
     B = frame_rgb[:, :, 2]
 
-    r = 1
+    r = 1.1
     # Create mask: red dominant pixels
     red_mask = (((R.astype(float) / (G.astype(float) + 1)) > r) &
             (R.astype(float) / (B.astype(float) + 1) > r).astype(np.uint8) * 255)
+
+    blue_mask = (((B.astype(float) / (G.astype(float) + 1)) > r) &
+            (B.astype(float) / (R.astype(float) + 1) > r).astype(np.uint8) * 255)
+    
+    expanded_blue_mask = cv2.dilate(blue_mask, np.ones((7,7), np.uint8), iterations=1)
+    expanded_blue_and_red_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-
-    frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
-    frame = cv2.bitwise_and(frame, frame, mask=red_mask)
-    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
+    # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
+    lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
-    # all points for which red is greater than blue and green
+    l_min = 0
+    a_min = 130
+    b_min = 140
 
-
-    # Read slider values
-    l_min = cv2.getTrackbarPos("L_min", "Controls")
-    a_min = cv2.getTrackbarPos("A_min", "Controls")
-    b_min = cv2.getTrackbarPos("B_min", "Controls")
-
-    l_max = cv2.getTrackbarPos("L_max", "Controls")
-    a_max = cv2.getTrackbarPos("A_max", "Controls")
-    b_max = cv2.getTrackbarPos("B_max", "Controls")
+    l_max = 255
+    a_max = 255
+    b_max = 255
 
     lower = np.array([l_min, a_min, b_min])
     upper = np.array([l_max, a_max, b_max])
