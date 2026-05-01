@@ -156,7 +156,7 @@ class Vehicle:
             self.boustrophedon_init()
 
     def update(self):
-        ALPHA = 0.9
+        ALPHA = 0.99
         if self.uwb.is_leader and self.pid.state == PID_State.WAITING:
             self.dist_to_other = self.uwb.dist * ALPHA + (1-ALPHA) * self.dist_to_other
             print(self.dist_to_other)
