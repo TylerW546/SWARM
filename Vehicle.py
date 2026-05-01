@@ -151,7 +151,7 @@ class Vehicle:
             self.movement_data = {}
         elif state == MovementState.HUB_SPOKE:
             self.movement_state = MovementState.HUB_SPOKE
-            self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1}
+            self.movement_data = {"iterations": 4, "current_iteration": 0, "current_command_index": 0, "last_forward_time": 1, "distances": 1}
         elif state == MovementState.BOUSTROPHEDON:
             self.boustrophedon_init()
 
@@ -218,7 +218,7 @@ class Vehicle:
         self.movement_data = {"done_hub_spoke": False, "hub_spoke_result": None,
                               "initial_distance": None, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0,
-                              "forward_done": False}
+                              "forward_done": False, "distances": 0.5}
 
     def convergence_movement(self):
         if self.uwb.dist < CONVERGED_THRESHOLD:
@@ -326,9 +326,9 @@ class Vehicle:
             print("Test complete!")
         else:
             commands = [
-                ("straight", MOTOR_SPEED, 1), # forward
+                ("straight", MOTOR_SPEED, self.movement_data["distances"]), # forward
                 ("wait", 0.5),
-                ("straight", -MOTOR_SPEED, 1), # backward
+                ("straight", -MOTOR_SPEED, self.movement_data["distances"]), # backward
                 ("wait", 0.5),
                 ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
                 ("wait", 0.5),
