@@ -41,7 +41,7 @@ ENCODER_R = 16
 # Left motor
 IN3 = 17
 IN4 = 27
-ENB = 22 # PWM 22
+ENB = 20 # PWM 22
 ENCODER_L = 19
 
 # IR sensor
