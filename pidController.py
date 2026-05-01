@@ -223,7 +223,7 @@ class pidController:
 
         self.speed_history.append(self.speeds.copy())
         self.signal_history.append(self.signals.copy())
-        print(f"[SIGNALS]: {self.signals[LEFT_WHEEL]}, {self.signals[RIGHT_WHEEL]}")
+        # print(f"[SIGNALS]: {self.signals[LEFT_WHEEL]}, {self.signals[RIGHT_WHEEL]}")
 
     def rotate_left_update(self):
         if self.state != PID_State.TURNING_LEFT:
