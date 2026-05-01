@@ -114,7 +114,6 @@ class pidController:
 
         self.pid_start = time.perf_counter()
 
-
     def move_straight(self, speed, distance):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
@@ -127,8 +126,8 @@ class pidController:
         self.state_values = {"target_speed": speed, "distance": distance}
 
         # Tell the L298N library to start moving forward
-        self.motor_driver.motor_left_rotate(self.signals[LEFT_WHEEL])
-        self.motor_driver.motor_right_rotate(self.signals[RIGHT_WHEEL])
+        self.motor_driver.motor_left_rotate(self.signals[LEFT_WHEEL]*1.5)
+        self.motor_driver.motor_right_rotate(self.signals[RIGHT_WHEEL]*1.5)
 
     def rotate_right(self, degrees):
         """
@@ -145,14 +144,14 @@ class pidController:
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}        
 
         # Tell the L298N library to start rotating
-        self.motor_driver.motor_left_rotate(TURN_SPEED)
-        self.motor_driver.motor_right_rotate(-TURN_SPEED)
+        self.motor_driver.motor_left_rotate(TURN_SPEED*1.5)
+        self.motor_driver.motor_right_rotate(-TURN_SPEED*1.5)
 
     def rotate_left(self, degrees):
         """
         Drives the robot straight forward using PID control to balance motor speeds.
         """
-        
+
         self.reset_pid()
         self.reset_timer()
 
@@ -163,8 +162,8 @@ class pidController:
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
 
         # Tell the L298N library to start rotating
-        self.motor_driver.motor_left_rotate(-TURN_SPEED)
-        self.motor_driver.motor_right_rotate(TURN_SPEED)
+        self.motor_driver.motor_left_rotate(-TURN_SPEED*1.5)
+        self.motor_driver.motor_right_rotate(TURN_SPEED*1.5)
 
     def update(self):
         if self.state == PID_State.IDLE or self.state == PID_State.WAITING:
