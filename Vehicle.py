@@ -221,6 +221,10 @@ class Vehicle:
                               "forward_done": False}
 
     def convergence_movement(self):
+        if self.uwb.dist < CONVERGED_THRESHOLD:
+            self.start_celebration()
+            print("Convergence is done")
+            
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
                 self.movement_queue.append(("wait", 4))
@@ -256,15 +260,15 @@ class Vehicle:
             else:
                 self.movement_state = MovementState.IDLE
                 print("Convergence movement: hub spoke inconclusive, not moving forward")
-
-        # convergence forward movement done, but hit obstacle.
-        elif self.uwb.dist < CONVERGED_THRESHOLD:
-            self.start_celebration()
-            print("Convergence is done")
             
         elif self.pid.state_values.get("last_state_success", True) == False:
             self.start_convergence()
             print("Convergence movement: obstacle detected, stopping movement")
+        else:
+            print("Convergence movement: went forward without detecting obstacle, restarting convergence to try to get closer")
+            self.start_convergence()
+            
+
 
 
                 
