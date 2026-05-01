@@ -19,7 +19,7 @@ def camera_process(camera):
 
     frame = camera.capture_array()
     #downsample for faster processing
-    # frame = frame[::2, ::2]
+    frame = frame[::2, ::2]
     frame = cv2.flip(frame, -1)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -40,6 +40,7 @@ def camera_process(camera):
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+    # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
     l_min = 0
@@ -103,7 +104,7 @@ class Vehicle:
         self.uwb = UWBInterface(self.ser)
         self.uwb.assign_id(str(uuid.getnode()))
 
-        self.dist_to_other = None
+        self.dist_to_other = 0
 
         try:
             self.camera = Picamera2()
@@ -183,16 +184,16 @@ class Vehicle:
             elif self.movement_state == MovementState.CONVERGENCE:
                 self.convergence_movement()
 
-        # cx, cy, cr, pixel_count = camera_process(self.camera)
-        # if cr > 0 and self.movement_state != MovementState.CELEBRATION:
-        #     print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
-        #     self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
-        #     print(f"Seen target count: {self.movement_data['seen_target_count']}")
-        #     if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
-        #         self.start_celebration()
-        #         return
-        # else:
-        #     self.movement_data["seen_target_count"] = 0
+        cx, cy, cr, pixel_count = camera_process(self.camera)
+        if cr > 0 and self.movement_state != MovementState.CELEBRATION:
+            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
+            self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
+            print(f"Seen target count: {self.movement_data['seen_target_count']}")
+            if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
+                self.start_celebration()
+                return
+        else:
+            self.movement_data["seen_target_count"] = 0
 
         
 
@@ -225,6 +226,8 @@ class Vehicle:
                               "forward_done": False, "distances": 0.75}
 
     def convergence_movement(self):
+        
+            
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
                 self.movement_queue.append(("wait", 4))
@@ -242,12 +245,12 @@ class Vehicle:
                 print("Hub spoke result: failed")
             elif self.movement_data["current_command_index"] == 3: # after waiting command
                 print(f"end of spoke, current distance: {self.dist_to_other}m")
-                if self.dist_to_other is not None and self.dist_to_other < CONVERGED_THRESHOLD:
+                if self.dist_to_other < CONVERGED_THRESHOLD:
                     self.start_celebration()
                     print("Convergence is done")
                     return
 
-                if self.dist_to_other is not None and self.dist_to_other < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
+                if self.dist_to_other < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
                     self.movement_queue = []
                     
                     self.movement_data["done_hub_spoke"] = True
