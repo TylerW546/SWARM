@@ -28,7 +28,7 @@ class UWBInterface:
 
         self.requesting_reset = False
 
-        self.dist = 0
+        self.dist = None
 
 
     def assign_id(self, id):
