@@ -50,8 +50,6 @@ while True:
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
 
-    lab = cv2.bitwise_and(lab, lab, mask=red_mask)
-
     frame_rgb = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     frame = cv2.bitwise_and(frame, frame, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=red_mask)
