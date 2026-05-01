@@ -83,7 +83,7 @@ while True:
     orange_circles = cv2.HoughCircles(
         orange, cv2.HOUGH_GRADIENT,
         dp=1, minDist=20,
-        param1=50, param2=30,
+        param1=50, param2=10,
         minRadius=5, maxRadius=1000
     )
 
