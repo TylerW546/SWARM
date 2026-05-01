@@ -57,15 +57,15 @@ while True:
     if v.uwb.uwb_messages_recieved:
         # print("Received UWB messages:")
         for msg in v.uwb.uwb_messages_recieved:
-            if not msg.startswith("GOT"):
-                print("got " + msg)
+            # if not msg.startswith("GOT"):
+            #     print("got " + msg)
             if msg.startswith("GOT_DIST:"):
                 dist = float(msg[9:])
                 v.uwb.dist = dist
                 # print(f"Distance received from child: {dist}m")
             elif msg == "RESETTING" and not leader:
                 v.uwb.requesting_reset = True
-            elif msg == "FOUND_TARGET" and v.movement_state != MovementState.CONVERGENCE:
+            elif msg == "FOUND_TARGET" and v.movement_state != MovementState.CONVERGENCE and v.movement_state != MovementState.CELEBRATION:
                 v.start_convergence()
         v.uwb.uwb_messages_recieved = []
     # elif v.state == State.INIT_PARENTING:
