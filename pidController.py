@@ -5,11 +5,14 @@ import lgpio
 import time
 from Util import *
 from enum import Enum 
+import threading
 
 LOG = False
 
 LEFT_WHEEL = "left"
 RIGHT_WHEEL = "right"
+
+STALL_TIMEOUT = 1
 
 def log(s):
     if LOG:
@@ -17,12 +20,27 @@ def log(s):
 
 class pidController:
 
+    def reset_timer(self):
+        self.timer.cancel()
+        self.timer = threading.Timer(STALL_TIMEOUT, self.timeout_handler)
+        self.timer.start()
+
+    def timeout_handler(self):
+        if self.state == PID_State.IDLE:
+            return
+
+        print("Vehicle stuck - stopping movement.")
+        self.state = PID_State.IDLE
+        self.motor_driver.stop_all()
+
     def encoder_callback(self, wheel, timestamp):
+        self.reset_timer()
+
         self.encoder_count[wheel] += 1
 
         elapsed = (timestamp - self.last_update[wheel]) / 1_000_000_000.
 
-        ALPHA = 0.7 # TODO: tune
+        ALPHA = 0.7
 
         measured_speed = 1. / elapsed
         prev_speed = self.speeds[wheel]
@@ -68,6 +86,10 @@ class pidController:
         # --- Track update time for calculating wheel speed
         self.pid_start = -1
 
+        # Timer that stops bot from attempting to move if stuck
+        self.timer = threading.Timer(STALL_TIMEOUT, self.timeout_handler)
+        self.timer.start()
+
         # Register callbacks
         lgpio.gpio_claim_alert(chip, encoder_l_pin, lgpio.RISING_EDGE)
         self.cb_left = lgpio.callback(chip, encoder_l_pin, lgpio.RISING_EDGE, self.encoder_left_callback)
@@ -99,6 +121,7 @@ class pidController:
         """
 
         self.reset_pid()
+        self.reset_timer()
 
         self.state = PID_State.STRAIGHT
         self.state_values = {"target_speed": speed, "distance": distance}
@@ -113,6 +136,7 @@ class pidController:
         """
 
         self.reset_pid()
+        self.reset_timer()
 
         # Encoder counts to reach
         counts = degrees/5
@@ -130,6 +154,7 @@ class pidController:
         """
         
         self.reset_pid()
+        self.reset_timer()
 
         # Encoder counts to reach
         counts = degrees/5
