@@ -156,11 +156,6 @@ class Vehicle:
             self.boustrophedon_init()
 
     def update(self):
-        # ALPHA = 0.99
-        if self.uwb.is_leader and self.pid.state == PID_State.WAITING:
-            self.dist_to_other = self.uwb.dist # * ALPHA + (1-ALPHA) * self.dist_to_other
-            print(self.dist_to_other)
-
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
@@ -171,6 +166,11 @@ class Vehicle:
                 self.pid.rotate_left(degrees=command[1])
             elif command[0] == "wait":
                 self.pid.wait(seconds=command[1])
+
+        # ALPHA = 0.99
+        if self.uwb.is_leader and self.pid.state == PID_State.WAITING:
+            self.dist_to_other = self.uwb.dist # * ALPHA + (1-ALPHA) * self.dist_to_other
+            print(self.dist_to_other)
 
         if self.pid.state == PID_State.IDLE or self.pid.state == PID_State.OVERRIDE:
             if self.movement_state == MovementState.HUB_SPOKE:
