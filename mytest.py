@@ -80,7 +80,6 @@ def run_test_file():
     driver.stop_all()
     driver.cleanup()
 
-    '''
     left_signals = []
     left_speeds = []
     right_speeds = []
@@ -98,7 +97,6 @@ def run_test_file():
 
     plt.legend()
     plt.show()
-    # '''
 
 
 
