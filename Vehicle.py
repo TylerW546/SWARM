@@ -224,6 +224,7 @@ class Vehicle:
         if self.uwb.dist < CONVERGED_THRESHOLD:
             self.start_celebration()
             print("Convergence is done")
+            return
             
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
