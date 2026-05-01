@@ -257,6 +257,8 @@ class Vehicle:
                 self.movement_state = MovementState.IDLE
                 self.movement_data["forward_done"] = True
                 print("Convergence movement: hub spoke failed, not moving forward")
+                self.start_convergence()
+                
                 
             else:
                 self.movement_state = MovementState.IDLE
