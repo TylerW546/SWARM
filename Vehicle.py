@@ -184,16 +184,16 @@ class Vehicle:
             elif self.movement_state == MovementState.CONVERGENCE:
                 self.convergence_movement()
 
-        cx, cy, cr, pixel_count = camera_process(self.camera)
-        if cr > 0 and self.movement_state != MovementState.CELEBRATION:
-            print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
-            self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
-            print(f"Seen target count: {self.movement_data['seen_target_count']}")
-            if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
-                self.start_celebration()
-                return
-        else:
-            self.movement_data["seen_target_count"] = 0
+        # cx, cy, cr, pixel_count = camera_process(self.camera)
+        # if cr > 0 and self.movement_state != MovementState.CELEBRATION:
+        #     print(f"Detected object in path at ({cx}, {cy}) with radius {cr} and pixel count {pixel_count}. Stopping movement.")
+        #     self.movement_data["seen_target_count"] = self.movement_data.get("seen_target_count", 0) + 1
+        #     print(f"Seen target count: {self.movement_data['seen_target_count']}")
+        #     if self.movement_data.get("seen_target_count", 0) >= SEEN_FRAMES_THRESHOLD:
+        #         self.start_celebration()
+        #         return
+        # else:
+        #     self.movement_data["seen_target_count"] = 0
 
         
 
