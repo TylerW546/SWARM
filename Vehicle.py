@@ -157,7 +157,7 @@ class Vehicle:
 
     def update(self):
         ALPHA = 0.7
-        if self.uwb.is_leader and self.pid.stat == PID_State.WAITING:
+        if self.uwb.is_leader and self.pid.state == PID_State.WAITING:
             self.dist_to_other = self.uwb.dist * ALPHA + (1-ALPHA) * self.dist_to_other
 
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
