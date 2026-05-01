@@ -220,7 +220,7 @@ class Vehicle:
         self.movement_data = {"done_hub_spoke": False, "hub_spoke_result": None,
                               "initial_distance": None, 
                               "iterations": 4, "current_iteration": 0, "current_command_index": 0,
-                              "forward_done": False, "distances": 0.5}
+                              "forward_done": False, "distances": 0.75}
 
     def convergence_movement(self):
         if self.dist_to_other < CONVERGED_THRESHOLD:
