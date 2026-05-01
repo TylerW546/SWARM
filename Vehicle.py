@@ -339,7 +339,7 @@ class Vehicle:
                 ("wait", 0.5),
                 ("straight", -MOTOR_SPEED, self.movement_data["distances"]), # backward
                 ("wait", 0.5),
-                ("rotate_right", 360/self.movement_data["iterations"], None), # degrees
+                ("rotate_left", 360/self.movement_data["iterations"], None), # degrees
                 ("wait", 0.5),
             ]
             if self.movement_data["current_command_index"] < len(commands):
