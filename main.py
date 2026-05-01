@@ -50,7 +50,7 @@ while True:
 
     if v.state == State.WANDER:
         print(f"Distance to other: {v.dist_to_other}m, uwb says {v.uwb.dist}m")
-        if frame_count % 5 == 1:
+        if frame_count % 5 == 0:
             if leader:
                 v.uwb.enter_ranging_mode()
 
