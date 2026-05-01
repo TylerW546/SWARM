@@ -226,10 +226,7 @@ class Vehicle:
                               "forward_done": False, "distances": 0.75}
 
     def convergence_movement(self):
-        if self.dist_to_other < CONVERGED_THRESHOLD:
-            self.start_celebration()
-            print("Convergence is done")
-            return
+        
             
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
@@ -248,12 +245,18 @@ class Vehicle:
                 print("Hub spoke result: failed")
             elif self.movement_data["current_command_index"] == 3: # after waiting command
                 print(f"end of spoke, current distance: {self.dist_to_other}m")
+                if self.dist_to_other < CONVERGED_THRESHOLD:
+                    self.start_celebration()
+                    print("Convergence is done")
+                    return
+
                 if self.dist_to_other < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
                     self.movement_queue = []
                     
                     self.movement_data["done_hub_spoke"] = True
                     self.movement_data["hub_spoke_result"] = "closer"
                     print("Hub spoke result: closer")
+                
                     
         elif self.movement_data.get("forward_done", False) == False:
             if self.movement_data["hub_spoke_result"] == "closer":
