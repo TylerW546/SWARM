@@ -92,8 +92,8 @@ def run_test_file():
     plt.plot(left_speeds, label="l_speeds")
     plt.plot(right_speeds, label="r_speeds")
     plt.axhline(target_speed, linestyle="--")
-    # plt.plot(left_signals, label="l_signals")
-    # plt.plot(right_signals, label="r_signals")
+    plt.plot(left_signals, label="l_signals", linestyle=":")
+    plt.plot(right_signals, label="r_signals", linestyle=":")
 
     plt.legend()
     plt.show()
