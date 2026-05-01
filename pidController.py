@@ -138,7 +138,7 @@ class pidController:
         self.reset_timer()
 
         # Encoder counts to reach
-        counts = degrees/5
+        counts = degrees/6
 
         self.state = PID_State.TURNING_RIGHT
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}        
@@ -156,7 +156,7 @@ class pidController:
         self.reset_timer()
 
         # Encoder counts to reach
-        counts = degrees/5
+        counts = degrees/6
 
         self.state = PID_State.TURNING_LEFT
         self.state_values = {"target_speed": TURN_SPEED, "counts": counts}
