@@ -156,6 +156,8 @@ class Vehicle:
             self.boustrophedon_init()
 
     def update(self):
+        ALPHA = 0.7
+        self.dist_to_other = self.uwb.dist * ALPHA + (1-ALPHA) * self.dist_to_other
         if self.pid.state == PID_State.IDLE and len(self.movement_queue) > 0 and self.movement_state != MovementState.FOLLOW_TARGET_COLOR:
             command = self.movement_queue.pop(0)
             if command[0] == "straight":
@@ -221,7 +223,7 @@ class Vehicle:
                               "forward_done": False, "distances": 0.5}
 
     def convergence_movement(self):
-        if self.uwb.dist < CONVERGED_THRESHOLD:
+        if self.dist_to_other < CONVERGED_THRESHOLD:
             self.start_celebration()
             print("Convergence is done")
             return
@@ -231,7 +233,7 @@ class Vehicle:
                 self.movement_queue.append(("wait", 4))
                 self.movement_data["initial_distance"] = "waiting"
             elif self.movement_data["initial_distance"] == "waiting":
-                self.movement_data["initial_distance"] = self.uwb.dist
+                self.movement_data["initial_distance"] = self.dist_to_other
                 print(f"Starting hub spoke. Initial distance: {self.movement_data['initial_distance']}m")
             else:
                 self.hub_spoke_movement()
@@ -242,8 +244,8 @@ class Vehicle:
                 self.movement_data["hub_spoke_result"] = "failed"
                 print("Hub spoke result: failed")
             elif self.movement_data["current_command_index"] == 2: # after waiting command
-                print(f"end of spoke, current distance: {self.uwb.dist}m")
-                if self.uwb.dist < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
+                print(f"end of spoke, current distance: {self.dist_to_other}m")
+                if self.dist_to_other < self.movement_data["initial_distance"] - CLOSENESS_THRESHOLD: # if we got significantly closer, consider it a success
                     self.movement_data["done_hub_spoke"] = True
                     self.movement_data["hub_spoke_result"] = "closer"
                     print("Hub spoke result: closer")
