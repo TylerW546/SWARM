@@ -36,7 +36,7 @@ cv2.createTrackbar("B_max", "Controls", 255, 255, nothing)
 while True:
     frame = picam2.capture_array()
     #downsample for faster processing
-    frame = frame[::2, ::2]
+    # frame = frame[::2, ::2]
     frame = cv2.flip(frame, -1)
 
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -55,8 +55,8 @@ while True:
     expanded_blue_mask = cv2.dilate(blue_mask, np.ones((7,7), np.uint8), iterations=1)
     expanded_blue_and_red_mask = cv2.bitwise_and(red_mask, red_mask, mask=expanded_blue_mask)
     
-    frame = cv2.GaussianBlur(frame, (5,5), 0)
-    lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
+    lab = cv2.GaussianBlur(frame, (5,5), 0)
+    lab = cv2.cvtColor(lab, cv2.COLOR_BGR2LAB)
     # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
