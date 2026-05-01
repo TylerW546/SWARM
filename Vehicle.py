@@ -40,7 +40,6 @@ def camera_process(camera):
     
     frame = cv2.GaussianBlur(frame, (5,5), 0)
     lab = cv2.cvtColor(frame, cv2.COLOR_BGR2LAB)
-    # red_mask = cv2.bitwise_and(frame_rgb, frame_rgb, mask=red_mask)
     lab = cv2.bitwise_and(lab, lab, mask=expanded_blue_and_red_mask)
     
     l_min = 0

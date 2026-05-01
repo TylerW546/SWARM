@@ -37,7 +37,8 @@ while True:
         print("I am leader")
         leader = True
         # v.start_test(MovementState.BOUSTROPHEDON)
-        v.start_convergence()
+        # v.start_convergence()
+        v.start_celebration()
         # uwb.enter_ranging_mode()
         v.state = State.WANDER
         
