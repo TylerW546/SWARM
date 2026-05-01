@@ -88,14 +88,14 @@ while True:
     if orange_circles is not None:
         orange_circles = np.uint16(np.around(orange_circles))
         for i in orange_circles[0, :]:
-            cv2.circle(frame_rgb, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            cv2.circle(frame_rgb, (i[0], i[1]), 2, (0, 0, 255), 3)
+            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
             break
 
     cv2.circle(lab, (IMAGE_WIDTH//2, IMAGE_HEIGHT//2), 10, (0, 0, 255), 2)
 
     cv2.imshow("lab", lab)
-    cv2.imshow("frame_rgb", frame_rgb)
+    cv2.imshow("frame", frame)
     cv2.imshow("orange", orange)
 
     if cv2.waitKey(1) == 27:
