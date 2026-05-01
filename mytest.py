@@ -65,8 +65,8 @@ def run_test_file():
 
     start = time.perf_counter()
     target_speed = 30
-    # pid.move_straight(-target_speed, 1)
-    pid.rotate_right(90)
+    pid.move_straight(-target_speed, 1)
+    # pid.rotate_right(90)
     while (1):
         pid.update()
         if pid.state == PID_State.IDLE:
