@@ -104,7 +104,7 @@ class Vehicle:
         self.uwb = UWBInterface(self.ser)
         self.uwb.assign_id(str(uuid.getnode()))
 
-        self.dist_to_other = 0
+        self.dist_to_other = None
 
         try:
             self.camera = Picamera2()
@@ -226,8 +226,6 @@ class Vehicle:
                               "forward_done": False, "distances": 0.75}
 
     def convergence_movement(self):
-        
-            
         if self.movement_data.get("done_hub_spoke", False) == False:
             if self.movement_data.get("initial_distance", None) is None:
                 self.movement_queue.append(("wait", 4))
