@@ -168,7 +168,7 @@ class Vehicle:
                 self.pid.wait(seconds=command[1])
 
         # ALPHA = 0.99
-        if self.uwb.is_leader and self.pid.state == PID_State.WAITING:
+        if not self.uwb.is_leader and self.pid.state == PID_State.WAITING:
             self.dist_to_other = self.uwb.dist # * ALPHA + (1-ALPHA) * self.dist_to_other
             print(self.dist_to_other)
 
