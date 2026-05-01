@@ -380,7 +380,7 @@ class Vehicle:
             print("Test complete!")
         else:
             commands = [
-                ("straight", MOTOR_SPEED, 1), # forward     # 0
+                ("straight", MOTOR_SPEED, 5), # forward     # 0
                 ("wait", 0.5),                              # 1
                 ("rotate", 90), # degrees                   # 2
                 ("wait", 0.5),                              # 3
