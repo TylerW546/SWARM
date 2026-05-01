@@ -40,7 +40,7 @@ class UWBInterface:
 
     def enter_ranging_mode(self):
         if self.is_ranging:
-            print("Already ranging, cannot enter ranging mode again.")
+            # print("Already ranging, cannot enter ranging mode again.")
             if time.time() - self.range_start_time > 5:
                 print("Been ranging for a while, resetting ranging state.")
                 self.is_ranging = False
