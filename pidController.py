@@ -204,6 +204,7 @@ class pidController:
 
         if (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) >= self.state_values["counts"]:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
+            self.timer.cancel()
             self.motor_driver.stop_all()
             self.state = PID_State.IDLE
             return
@@ -231,6 +232,7 @@ class pidController:
 
         if (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) >= self.state_values["counts"]:
             print("Rotation complete. Final Encoder Counts:", self.encoder_count)
+            self.timer.cancel()
             self.motor_driver.stop_all()
             self.state = PID_State.IDLE
             return
@@ -295,6 +297,7 @@ class pidController:
         if distance_traveled >= distance:
             # log("Movement complete. Final Encoder Counts:", self.encoder_count)
             self.state = PID_State.IDLE
+            self.timer.cancel()
             self.motor_driver.stop_all()
             self.state_values = {
                 "last_state_success": True,
@@ -306,6 +309,7 @@ class pidController:
         # Only stop if we're moving forward and detect an object
         if self.sonar.distance > 0 and self.sonar.distance < DISTANCE_THRESHOLD and speed > 0:
             print("Object detected during straight movement! Stopping.")
+            self.timer.cancel()
             self.motor_driver.stop_all()
             self.state = PID_State.IDLE
             counts = (self.encoder_count[LEFT_WHEEL] + self.encoder_count[RIGHT_WHEEL]) // 2
